@@ -1,0 +1,42 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+build-graphical-client-Desktop_Qt_6_4_1_GCC_64bit-Debug/
+use_case/graphical-client/CMakeLists.txt.user
+backup/
+use_case/ESP32SMFW/wifi_info.h
+
+.vscode/*
+.vscode
+.vscode/settings.json
+
+out.csv

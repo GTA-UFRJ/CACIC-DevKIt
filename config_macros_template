@@ -1,0 +1,36 @@
+/*
+ * Teleinformatic and Automation Group (GTA, Coppe, UFRJ)
+ * Author: Guilherme Araujo Thomaz
+ * Descripton: configuration flags
+ */
+
+#define DEBUG_PRINT 1
+#define DEBUG_TIMER 1
+#define TOKENS_PATH "(ROOT)/core/server/resources"
+#define PATH_MAX_SIZE 128
+#define ENCLAVE_PATH "server_enclave.signed.so"
+#define URL_MAX_SIZE 4096
+#define TEST_CLIENT_URL "localhost"
+#define SERVER_URL "(SERVERURL)"
+#define SERVER_PORT (SERVERPORT)
+#define HTTPLIB_PATH "/home/guiaraujo/cpp-httplib/httplib.h"
+#define SEALS_PATH "(ROOT)/core/server/resources"
+#define LATENCY_MS 0
+#define SEALED_SIZE 8192
+#define RESULT_MAX_SIZE 1024
+#define MAX_DATA_SIZE 1024
+#define TOKEN_NAME "72d41281"
+#define MAX_ENC_DATA_SIZE 227
+#define MAX_AGGREGATION_TOTAL_SIZE 20
+#define MAX_NUM_DATAS_QUERIED 2048
+#define MAX_PAYLOAD_SIZE 128
+#define MAX_NUM_PERMISSIONS 10
+#define MAX_DB_COMMAND_SIZE 2048
+
+#define DATABASE_PATH "(ROOT)/use_case/database/taciot.db"
+#define DEFAULT_PERMS_DB_PATH "(ROOT)/use_case/database/default_permissions.db"
+#define CLIENT_KEY_FILENAME "(ROOT)/use_case/database/identity"
+#define AP_URL "(APURL)"
+#define AP_PORT (APPORT)
+#define MAX_ARG_SIZE 256
+#define MAX_NUM_ARGS 16
