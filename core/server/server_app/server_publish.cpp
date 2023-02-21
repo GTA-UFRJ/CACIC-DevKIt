@@ -133,7 +133,7 @@ server_error_t parse_request(char* msg, iot_message_t* p_rcv_msg)
         if (i == 9) {
             p_rcv_msg->encrypted = (uint8_t*)malloc((p_rcv_msg->encrypted_size+1) * sizeof(uint8_t));
 
-            ret = convert_text_to_buffer(token, 3*p_rcv_msg->encrypted_size, p_rcv_msg->encrypted, NULL);
+            ret = convert_text_to_buffer(token, 3*(p_rcv_msg->encrypted_size), p_rcv_msg->encrypted, NULL);
             p_rcv_msg->encrypted[p_rcv_msg->encrypted_size] = '\0'; 
         }
     }
@@ -231,7 +231,8 @@ server_error_t server_publish(const Request& req, Response& res, sgx_enclave_id_
         processed_data,
         &processed_data_size,
         &enc_ret);
-    if(DEBUG_PRINT) printf("Exiting enclave\n");
+    if(DEBUG_PRINT) printf("\n------------ EXITED ENCLAVE -----------\n");
+    
 
     ret = (server_error_t) enc_ret;
 
@@ -241,7 +242,7 @@ server_error_t server_publish(const Request& req, Response& res, sgx_enclave_id_
 
     if(sgx_ret != SGX_SUCCESS || ecall_status != SGX_SUCCESS || ret != OK) {
         free(processed_data);
-        printf("SGX return error code: 0x%04x\n Ecall status error code: 0x%04x\n", (int)sgx_ret, (int)ecall_status);
+        printf("\nSGX return error code: 0x%04x\nEcall status error code: 0x%04x\n", (int)sgx_ret, (int)ecall_status);
         if(ret != OK) return print_error_message(ret);
         else return print_error_message(PUBLICATION_ENCLAVE_ERROR);
     }

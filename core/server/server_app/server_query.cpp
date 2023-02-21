@@ -173,7 +173,7 @@ server_error_t get_response(stored_data_t stored,
         rcv_msg.pk,
         response,
         &enc_ret);
-    if(DEBUG_PRINT) printf("Exiting enclave\n");
+    if(DEBUG_PRINT) printf("\n------------ EXITED ENCLAVE -----------\n");
 
     ret = (server_error_t) enc_ret;
 

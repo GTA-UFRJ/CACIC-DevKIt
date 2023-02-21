@@ -33,7 +33,7 @@ void signal_handler (int sigNumber)
     }
 }
 
-int main (int argc, char** argv)
+int main ()
 {
     // Activate handler for process termination and interruption signals
     if(signal(SIGTERM, signal_handler) == SIG_ERR || signal(SIGINT, signal_handler) == SIG_ERR) 
@@ -42,14 +42,7 @@ int main (int argc, char** argv)
     using namespace httplib;
     Server svr;
 
-    // Select beetween secure or insecure modes
-    if (argc < 2)
-        return print_error_message(INIT_ERROR);
-
-    bool secure = (*argv[1]=='i' ? false : true);  
-
-    if(DEBUG_PRINT == true) printf("---------------------------------------\nInitialized server ");
-    if(DEBUG_PRINT == true) secure ? printf("(secure mode)\n") : printf("(insecure mode)\n");
+    if(DEBUG_PRINT == true) printf("---------------------------------------\nInitialized server \n");
 
     // Initialize database
     /* if(configure_database()) {

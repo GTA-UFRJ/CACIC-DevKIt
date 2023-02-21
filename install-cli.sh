@@ -7,7 +7,7 @@ SERVER_PORT=$5
 
 g++ -c use_case/client/client_permdb_config.cpp -o use_case/client/client_permdb_config.o
 g++ use_case/client/client_permdb_config.o -l sqlite3 -o use_case/client/client_permdb_config
-.use_case/client/client_permdb_config default_permissions.db
+./use_case/client/client_permdb_config default_permissions.db
 
 cp config_macros_template config_macros.h
 python3 setup_macros_file.py "(ROOT)" "$PWD"

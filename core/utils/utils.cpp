@@ -102,11 +102,11 @@ void get_time(char* result) {
 
 int convert_text_to_buffer(char* text, uint32_t text_size, uint8_t* buffer, uint32_t* p_buffer_size) 
 {
+    uint32_t buffer_size = text_size/3;
+
     char* invalid_char;
     char auxiliar[3];
-    *p_buffer_size = text_size/3;
-
-    for (uint32_t i=0; i<*p_buffer_size; i++){
+    for (uint32_t i=0; i<buffer_size; i++){
         auxiliar[0] = text[3*i];
         auxiliar[1] = text[3*i+1];
         auxiliar[2] = '\0';
@@ -116,17 +116,22 @@ int convert_text_to_buffer(char* text, uint32_t text_size, uint8_t* buffer, uint
         if(auxiliar != 0 && *invalid_char != 0) 
             return -1;
     }
+
+    if(p_buffer_size != NULL) *p_buffer_size = buffer_size;
     return 0;
 }
 
 int convert_buffer_to_text(uint8_t* buffer, uint32_t buffer_size, char* text, uint32_t* p_text_size) 
 {
-    *p_text_size = buffer_size*3;
+    uint32_t text_size = buffer_size*3;
+
     char auxiliar[4];
     for (uint32_t i=0; i<buffer_size; i++) {
         sprintf(auxiliar, "%02x-", buffer[i]);
         memcpy(&text[3*i], auxiliar, 3);
     }
-    text[*p_text_size] = '\0';
+    text[text_size] = '\0';
+
+    if(p_text_size != NULL) *p_text_size = text_size;
     return 0;
 }

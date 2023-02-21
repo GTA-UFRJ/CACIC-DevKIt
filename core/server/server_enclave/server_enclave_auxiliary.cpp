@@ -71,13 +71,13 @@ sgx_status_t enclave_decrypt_data(
     sgx_status_t ret = sgx_rijndael128GCM_decrypt
         (&aes_key,
         enc_data + 16 + 12,
-        enc_data_size,
+        enc_data_size-12-16,
         plain_data,
         enc_data + 16,
         12,
         NULL,
         0,
-        (const sgx_aes_gcm_128bit_tag_t*)enc_data);
+        (const sgx_aes_gcm_128bit_tag_t*)(&enc_data[0]));
 
     return ret;
 }
@@ -88,8 +88,6 @@ server_error_t enclave_get_payload(
     char* payload, 
     uint32_t* payload_size) 
 {
-    server_error_t ret;
-
     // Verify if payload exists and is valid
     // time|2012-05-06.21:47:59|pk|72d41281|type|123456|payload|250|permission1|72d41281
     char* text = (char*)malloc(1+decrypted_size);
@@ -109,13 +107,13 @@ server_error_t enclave_get_payload(
                 free(text);
                 return INVALID_PAYLOAD_ERROR;
             }
-            *payload_size = strlen(payload);
+            *payload_size = strlen(token);
             strncpy(payload, token, *payload_size);
         }
     }
     free(text);
 
-    ret = OK;
+    return OK;
 }
 
 server_error_t enclave_verify_permissions(
@@ -151,7 +149,7 @@ server_error_t enclave_verify_permissions(
 
 server_error_t enclave_get_encrypted(
     char* data, 
-    uint32_t data_size, 
+    uint32_t , 
     uint8_t* encrypted, 
     uint32_t* p_encrypted_size) 
 {

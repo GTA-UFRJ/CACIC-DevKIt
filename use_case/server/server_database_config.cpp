@@ -37,7 +37,7 @@ static int callback_create_table(void* received_from_exec, int num_columns, char
 int configure_database(char* name){
 
     char path[256];
-    sprintf(path, "./database/%s", name);
+    sprintf(path, "./use_case/database/%s", name);
 
     if(verify_if_file_exists(path)) {
         printf("Database file alredy exists\n");

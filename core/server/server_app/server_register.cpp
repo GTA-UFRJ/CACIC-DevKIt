@@ -111,6 +111,7 @@ server_error_t seal_key(register_message_t rcv_msg, sgx_enclave_id_t global_eid,
             &real_sealed_size, 
             rcv_msg.ck, 
             16);
+    if(DEBUG_PRINT) printf("\n------------ EXITED ENCLAVE -----------\n");
 
     if(sgx_ret != SGX_SUCCESS || ecall_status != SGX_SUCCESS ) {
         printf("SGX return error code: 0x%04x\n Ecall status error code: 0x%04x\n", (int)sgx_ret, (int)ecall_status);

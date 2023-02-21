@@ -45,7 +45,7 @@ int send_data_for_publication(char* time, char* pk, char* type, uint8_t* enc_dat
     httplib::Client cli(SERVER_URL, SERVER_PORT);
     std::this_thread::sleep_for(std::chrono::milliseconds(LATENCY_MS));
 
-    printf("Sent %s\n", http_message);
+    printf("Message %s\n", http_message);
     auto res = cli.Get(http_message);
     free(http_message);
     
@@ -100,7 +100,7 @@ int client_publish(uint8_t* key, client_data_t data)
         strncpy(formatted_data+strlen(formatted_data), permission, strlen(permission));
     }
     free(permission);
-    printf("%s\n", formatted_data);
+    printf("Data: %s\n", formatted_data);
 
     uint32_t enc_data_size = MAX_ENC_DATA_SIZE;
     uint8_t* enc_data = (uint8_t *) malloc(enc_data_size*sizeof(uint8_t));
