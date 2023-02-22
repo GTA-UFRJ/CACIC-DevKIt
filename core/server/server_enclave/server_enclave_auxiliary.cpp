@@ -108,7 +108,7 @@ server_error_t enclave_get_payload(
                 return INVALID_PAYLOAD_ERROR;
             }
             *payload_size = strlen(token);
-            strncpy(payload, token, *payload_size);
+            memcpy(payload, token, *payload_size+1);
         }
     }
     free(text);
@@ -154,16 +154,22 @@ server_error_t enclave_get_encrypted(
     uint32_t* p_encrypted_size) 
 {
     unsigned i = 0;
-    char* token = strtok_r(data, "|", &data);
+    char* invalid_char;
     uint32_t encrypted_size;
+
+    char* token = strtok_r(data, "|", &data);
     while (token != NULL && i<8)
     {
         i++;
         token = strtok_r(NULL, "|", &data);
 
         // Get encrypted message size
-        if (i == 7) 
-            encrypted_size = (uint32_t)strtoul(token,NULL,16);
+        if (i == 7) {
+            encrypted_size = (uint32_t)strtoul(token, &invalid_char, 16);
+
+            if(token == 0 && *invalid_char != 0) 
+                return INVALID_ENCRYPTED_SIZE_FIELD_ERROR;
+        }
     }
     
     if(encrypted_size > *p_encrypted_size)
@@ -246,6 +252,8 @@ void enclave_free_data_array(
     free(datas_sizes);
 }
 
+
+// There is memory leackage in this function
 server_error_t enclave_multi_query_db(
     char* pk,
     uint8_t* key,
@@ -255,72 +263,65 @@ server_error_t enclave_multi_query_db(
     uint32_t* datas_sizes, 
     uint32_t* p_data_count) 
 {
-    char** stored_datas = (char**)malloc(sizeof(char*)*2048);
-    uint32_t* stored_datas_sizes = (uint32_t*)malloc(sizeof(uint32_t)*2048); 
-    uint32_t data_count;
+    uint32_t max_data_size = 1024; 
+    uint32_t max_data_count = 10;
+    char** stored_datas = (char**)malloc(sizeof(char*)*max_data_count);
+    uint32_t* stored_datas_sizes = (uint32_t*)malloc(sizeof(uint32_t)*max_data_count); 
 
     // OCALL 
-    int ret = (int)OK; 
     //ocall_print_string("\nI will call ocall_multi_query_db()");
+    int ret = (int)OK; 
+    uint32_t data_count;
     ocall_multi_query_db(&ret, command, command_size, stored_datas, stored_datas_sizes, &data_count);
     if(ret) return (server_error_t)ret;
 
     uint32_t max_encrypted_size = 1024;
-    uint32_t max_plain_data_size = 1024;
+    uint32_t max_plain_data_size = 1024; 
 
+    uint32_t encrypted_size = max_encrypted_size;
     uint8_t encrypted[max_encrypted_size];
     memset(encrypted, 0, max_encrypted_size);
-    uint32_t encrypted_size;
 
     uint8_t plain_data[max_plain_data_size];
     memset(plain_data, 0, max_plain_data_size);
-    uint32_t plain_data_size;
+    uint32_t plain_data_size = max_plain_data_size;
 
     bool accepted = false;
 
     for(unsigned i=0; i<data_count; i++) {
 
         ret = (int) enclave_get_encrypted(stored_datas[i], stored_datas_sizes[i], encrypted, &encrypted_size);
-        if(ret) {
-            enclave_free_data_array(stored_datas, stored_datas_sizes, *p_data_count);
+        if(ret) 
             return (server_error_t)ret;
-        }
 
         plain_data_size = encrypted_size - 12 - 16;
-        if(plain_data_size > max_plain_data_size) {
-            enclave_free_data_array(stored_datas, stored_datas_sizes, *p_data_count);
+        if(plain_data_size > max_plain_data_size) 
             return RESULT_BUFFER_OVERFLOW_ERROR;
-        }
 
         sgx_status_t sgx_ret = enclave_decrypt_data(key, encrypted, encrypted_size, plain_data);
-        if(sgx_ret != SGX_SUCCESS) {
-            enclave_free_data_array(stored_datas, stored_datas_sizes, *p_data_count);
+        if(sgx_ret != SGX_SUCCESS) 
             return DATA_DECRYPTION_ERROR;
-        }
 
-        if(memcmp(stored_datas[i]+40, plain_data+28, 8)) {
-            enclave_free_data_array(stored_datas, stored_datas_sizes, *p_data_count);
+        if(memcmp(stored_datas[i]+40, plain_data+28, 8)) 
             return DATA_VALIDITY_ERROR;
-        }
 
         ret = (int) enclave_verify_permissions(plain_data, plain_data_size, pk, &accepted);
-        if(ret) {
-            enclave_free_data_array(stored_datas, stored_datas_sizes, *p_data_count);
-            return ACCESS_DENIED;
-        }
+        if(ret) 
+            return (server_error_t)ret;
 
         if(accepted) {
-            datas[*p_data_count] = (char*)malloc(max_plain_data_size);
             memcpy(datas[*p_data_count], plain_data, plain_data_size);
             datas_sizes[*p_data_count] = plain_data_size;
+            //ocall_print_string((const char*) datas[*p_data_count]);
+            //ocall_print_number((long)plain_data_size);
             (*p_data_count)++;
         }
 
         memset(encrypted, 0, max_encrypted_size);
         memset(plain_data, 0, max_plain_data_size);
+        accepted = false;
     }
 
-    enclave_free_data_array(stored_datas, stored_datas_sizes, *p_data_count);
     return OK;
 }
 

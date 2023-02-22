@@ -46,7 +46,7 @@ server_error_t enclave_get_permissions(
     uint32_t plain_data_size,
     char* permissions,
     uint32_t* p_permissions_size);
-
+    
 void enclave_free_data_array(
     char** datas, 
     uint32_t* datas_sizes, 

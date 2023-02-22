@@ -113,7 +113,7 @@ int convert_text_to_buffer(char* text, uint32_t text_size, uint8_t* buffer, uint
         
         buffer[i] = (uint8_t)strtoul(auxiliar, &invalid_char, 16);
 
-        if(auxiliar != 0 && *invalid_char != 0) 
+        if(auxiliar == 0 || *invalid_char != 0) 
             return -1;
     }
 

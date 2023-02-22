@@ -170,7 +170,7 @@ server_error_t database_read(sqlite3* db, char* command, char** datas, uint32_t*
     uint32_t data_size; 
     for(unsigned i=0; i<passed_to_callback.data_count; i++) {
         data_size = passed_to_callback.datas_sizes[i];
-        datas_sizes[i] = data_size;
+        datas_sizes[i] = data_size; 
         datas[i] = (char*)malloc(data_size * sizeof(char));
         memcpy(datas[i], (passed_to_callback.datas)[i], data_size);
     }

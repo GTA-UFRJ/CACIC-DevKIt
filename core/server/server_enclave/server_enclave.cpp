@@ -127,6 +127,7 @@ sgx_status_t enclave_publication_wrapper(
 
     if(*p_error_code != OK)
         return ret;
+    if(debug) ocall_print_string((const char*)payload);
 
     if(debug) ocall_print_string("\nChoose processing task");
 
@@ -140,7 +141,8 @@ sgx_status_t enclave_publication_wrapper(
 
     uint32_t result_payload_size = 128;
     uint8_t result_payload[result_payload_size];
-    if(task != NULL)
+
+    if(task != NULL) {
         *p_error_code = task
             (time, 
              pk, 
@@ -150,6 +152,11 @@ sgx_status_t enclave_publication_wrapper(
              storage_key, 
              result_payload, 
              &result_payload_size);
+             
+        if(*p_error_code != OK)
+            return ret;
+    }
+    
     else {
         result_payload_size = payload_size;
         memcpy(result_payload, payload, payload_size);
