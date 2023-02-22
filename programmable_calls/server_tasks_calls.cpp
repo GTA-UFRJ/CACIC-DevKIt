@@ -38,7 +38,7 @@ server_error_t aggregation
     uint32_t* datas_sizes = (uint32_t*)malloc(sizeof(uint32_t)*2048); 
     uint32_t data_count;
 
-    server_error_t ret = enclave_multi_query_db(pk, storage_key, payload, datas, datas_sizes, &data_count);
+    server_error_t ret = enclave_multi_query_db(pk, storage_key, payload, strlen(payload), datas, datas_sizes, &data_count);
     if(ret) {
         enclave_free_data_array(datas, datas_sizes, data_count);
         return ret;

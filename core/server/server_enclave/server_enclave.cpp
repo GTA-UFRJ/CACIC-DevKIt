@@ -207,7 +207,7 @@ sgx_status_t enclave_retrieve_data(
     uint8_t* result,
     int* p_error_code)
 {
-    if(debug) ocall_print_string("\n------------ ENTERED ENCLAVE -----------");
+     if(debug) ocall_print_string("\n------------ ENTERED ENCLAVE -----------");
 
     // Verify if nonce is fresh
     // TODO
@@ -224,6 +224,7 @@ sgx_status_t enclave_retrieve_data(
         *p_error_code = (int)UNSEAL_CLIENT_KEY_ERROR;
         return ret;
     }
+    if(debug) ocall_print_secret(&querier_key[0], 16);
 
     if(debug) ocall_print_string("\nUnsealing storage key");
 
@@ -233,6 +234,7 @@ sgx_status_t enclave_retrieve_data(
         *p_error_code = (int)UNSEAL_CLIENT_KEY_ERROR;
         return ret;
     }
+    if(debug) ocall_print_secret(&storage_key[0], 16);
 
     if(debug) ocall_print_string("\nDecrypt encrypted pk field of query message");
 
@@ -257,14 +259,15 @@ sgx_status_t enclave_retrieve_data(
 
     // Decrypt encrypted stored data
     uint32_t decrypted_size = encrypted_data_size - 12 - 16;
-    uint8_t decrypted [decrypted_size];
-    memset(decrypted, 0, decrypted_size);
+    uint8_t decrypted [decrypted_size+1];
     ret = enclave_decrypt_data(&storage_key[0], encrypted_data, encrypted_data_size, &decrypted[0]);
 
     if(ret != SGX_SUCCESS) {
         *p_error_code = (int)MESSAGE_DECRYPTION_ERROR;
         return ret;
     }
+    decrypted[decrypted_size] = 0;
+    if(debug) ocall_print_string((const char*)decrypted);
 
     if(debug) ocall_print_string("\nVerify access permissions");
 

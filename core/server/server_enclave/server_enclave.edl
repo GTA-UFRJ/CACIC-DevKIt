@@ -61,11 +61,11 @@ enclave {
             int debug,
             [in,size=576] sgx_sealed_data_t* sealed_querier_key,
             [in,size=576] sgx_sealed_data_t* sealed_storage_key,
-            [in,size=36] uint8_t* encrypted_pk,
+            [in,size=37] uint8_t* encrypted_pk,
             [in,size=encrypted_data_size] uint8_t* encrypted_data,
             uint32_t encrypted_data_size,
             [in,size=9] char* querier_pk,
-            [out,size=1024] uint8_t* result,
+            [out,size=encrypted_data_size] uint8_t* result,
             [out,count=1] int* p_error_code);
 
         public sgx_status_t enclave_sealing_data(
@@ -96,9 +96,10 @@ enclave {
         
         void ocall_multi_query_db(
             [out,count=1] int* p_ret,
-            [in,size=2048] char* command, 
-            [in,count=2048] char** datas, 
-            [out,count=2048] uint32_t* datas_sizes, 
+            [in,size=command_size] char* command,
+            uint32_t command_size,  
+            [out,count=2048] char** datas, 
+            [out,size=2048] uint32_t* datas_sizes, 
             [out,count=1] uint32_t* p_data_count);
     }; 
 };

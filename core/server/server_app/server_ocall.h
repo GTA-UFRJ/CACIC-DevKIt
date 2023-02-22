@@ -18,6 +18,12 @@ void ocall_print_string(const char* text);
 
 void ocall_query_db(int* p_ret, char* command, uint32_t index, char* data, uint32_t* p_data_size);
 
-void ocall_multi_query_db(int* p_ret, char* command, char** datas, uint32_t* datas_sizes, uint32_t* p_data_count);
+void ocall_multi_query_db(
+    int* p_ret, 
+    char* command, 
+    uint32_t command_size, 
+    char** datas, 
+    uint32_t* datas_sizes, 
+    uint32_t* p_data_count);
 
 #endif

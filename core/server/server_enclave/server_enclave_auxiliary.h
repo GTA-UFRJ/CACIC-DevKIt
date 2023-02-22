@@ -63,6 +63,7 @@ server_error_t enclave_multi_query_db(
     char* pk,
     uint8_t* key,
     char* command, 
+    uint32_t command_size,
     char** datas, 
     uint32_t* datas_sizes, 
     uint32_t* p_data_count);

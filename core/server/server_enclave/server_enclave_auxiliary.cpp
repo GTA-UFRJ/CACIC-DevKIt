@@ -143,7 +143,7 @@ server_error_t enclave_verify_permissions(
             permission_count++;
         }
     }
-
+    free(text);
     return OK;
 }
 
@@ -250,6 +250,7 @@ server_error_t enclave_multi_query_db(
     char* pk,
     uint8_t* key,
     char* command, 
+    uint32_t command_size,
     char** datas, 
     uint32_t* datas_sizes, 
     uint32_t* p_data_count) 
@@ -260,7 +261,8 @@ server_error_t enclave_multi_query_db(
 
     // OCALL 
     int ret = (int)OK; 
-    ocall_multi_query_db(&ret, command, stored_datas, stored_datas_sizes, &data_count);
+    //ocall_print_string("\nI will call ocall_multi_query_db()");
+    ocall_multi_query_db(&ret, command, command_size, stored_datas, stored_datas_sizes, &data_count);
     if(ret) return (server_error_t)ret;
 
     uint32_t max_encrypted_size = 1024;

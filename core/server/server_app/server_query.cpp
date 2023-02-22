@@ -132,7 +132,7 @@ server_error_t get_query_message(const Request& req, char* snd_msg, uint32_t* p_
 
 server_error_t get_response(stored_data_t stored, 
                          sgx_enclave_id_t global_eid, 
-                         uint8_t* response, 
+                         uint8_t* enc_data, 
                          access_message_t rcv_msg)
 {
     if(DEBUG_TIMER) Timer t("enclave_get_response");
@@ -160,9 +160,10 @@ server_error_t get_response(stored_data_t stored,
     if(DEBUG_TIMER) Timer t2("retrieve_data");
     if(DEBUG_PRINT) printf("\nEntering enclave to verify access permissions\n");
 
-    sgx_status_t sgx_ret;
-    sgx_status_t ecall_status;
-    int enc_ret = (int)OK;
+    sgx_status_t sgx_ret = SGX_SUCCESS;
+    sgx_status_t ecall_status = SGX_SUCCESS;
+    int enc_ret = (int)ACCESS_DENIED;
+    
     sgx_ret = enclave_retrieve_data(global_eid, &ecall_status,
         DEBUG_PRINT,
         (sgx_sealed_data_t*)querier_sealed_data,
@@ -171,7 +172,7 @@ server_error_t get_response(stored_data_t stored,
         stored.encrypted,
         stored.encrypted_size,
         rcv_msg.pk,
-        response,
+        enc_data,
         &enc_ret);
     if(DEBUG_PRINT) printf("\n------------ EXITED ENCLAVE -----------\n");
 
@@ -181,7 +182,7 @@ server_error_t get_response(stored_data_t stored,
     free(storage_sealed_data);
 
     if(sgx_ret != SGX_SUCCESS || ecall_status != SGX_SUCCESS || ret != OK) {
-        printf("SGX return error code: 0x%04x\n Ecall status error code: 0x%04x\n", (int)sgx_ret, (int)ecall_status);
+        printf("\nSGX return error code: 0x%04x\nEcall status error code: 0x%04x\n", (int)sgx_ret, (int)ecall_status);
         if(ret != OK) return print_error_message(ret);
         else return print_error_message(RETRIEVE_DATA_ENCLAVE_ERROR);
     }
@@ -201,7 +202,7 @@ void make_response(uint8_t* enc_data, uint32_t enc_data_size, char* response)
     }
     response[15+enc_data_size*3] = '\0';
     
-    if(DEBUG_PRINT) printf("Sending message: %s\n", response);
+    if(DEBUG_PRINT) printf("Message: %s\n", response);
 }
 
 server_error_t server_query(const Request& req, Response& res, sgx_enclave_id_t global_eid)
@@ -241,9 +242,10 @@ server_error_t server_query(const Request& req, Response& res, sgx_enclave_id_t 
 
     // Verify access permissions
     uint8_t *enc_data = (uint8_t*)malloc(message.encrypted_size);
-    char *response = (char*)malloc(15+3*message.encrypted_size+1);
+    char *response = (char*)malloc(RESULT_MAX_SIZE);
 
-    if(ret = get_response(message, global_eid, enc_data, rcv_msg)) {
+    ret = get_response(message, global_eid, enc_data, rcv_msg);
+    if(!ret) {
         if(DEBUG_PRINT) printf("\nAccess accepted\n");
         make_response(enc_data, message.encrypted_size, response);
         res.set_content(response, "text/plain");
