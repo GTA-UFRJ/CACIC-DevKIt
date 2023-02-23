@@ -8,6 +8,7 @@
 #include "server_enclave_auxiliary.h"
 #include <string.h>
 #include "server_enclave_t.h"
+#include <vector>
 
 std::vector<const char*> types{"123456", "555555"};
 std::vector<task_function_t> tasks{NULL, &aggregation};
@@ -34,20 +35,24 @@ server_error_t aggregation
  uint8_t* result,
  uint32_t* p_result_size)
 {
-    uint32_t max_data_size = 1024; 
-    uint32_t max_data_count = 10;
-    
+    /*
     char** datas = (char**)malloc(sizeof(char*)*max_data_count);
     uint32_t* datas_sizes = (uint32_t*)malloc(sizeof(uint32_t)*max_data_count); 
     for(unsigned i = 0; i < max_data_count; i++)
         datas[i] = (char*)malloc(max_data_size);
+    */
 
-    uint32_t data_count = 0;
-    server_error_t ret = enclave_multi_query_db(pk, storage_key, payload, strlen(payload), datas, datas_sizes, &data_count);
+   std::vector<std::string> datas;
+
+    server_error_t ret = enclave_multi_query_db(pk, storage_key, payload, payload_size, datas);
     if(ret) {
-        enclave_free_data_array(datas, datas_sizes, max_data_count);
+        //enclave_free_data_array(datas, datas_sizes, max_data_count);
         return ret;
     }
+
+    // DEBUG
+    for(unsigned j=0;j<datas.size();j++)
+        ocall_print_string((const char*)datas[j].c_str());
 
     uint32_t stored_payload_size = 128;
     char stored_payload[stored_payload_size];
@@ -56,15 +61,16 @@ server_error_t aggregation
     unsigned long numeric_payload = 0;
     unsigned long total = 0;
 
-    for(unsigned i=0; i<data_count; i++) 
+    char* invalid_char = NULL;
+    for(unsigned i=0; i<datas.size(); i++) 
     {
-        ret = enclave_get_payload((uint8_t*)(datas[i]), datas_sizes[i], stored_payload, &stored_payload_size); 
+        memset(stored_payload, 0, stored_payload_size);
+        ret = enclave_get_payload((uint8_t*)(datas[i].c_str()), datas[i].length(), stored_payload, &stored_payload_size); 
         if(ret) {
-            enclave_free_data_array(datas, datas_sizes, max_data_count);
+            //enclave_free_data_array(datas, datas_sizes, max_data_count);
             return ret;
         }
-        
-        char* invalid_char;
+
         numeric_payload = strtoul(stored_payload, &invalid_char, 10);
                     
         if(stored_payload != 0 && *invalid_char == 0) {
@@ -76,6 +82,7 @@ server_error_t aggregation
     *p_result_size = total_string.length();
     memcpy(result, total_string.c_str(), *p_result_size);
 
-    enclave_free_data_array(datas, datas_sizes, max_data_count);
+    //enclave_free_data_array(datas, datas_sizes, max_data_count);
+    
     return OK;
 }

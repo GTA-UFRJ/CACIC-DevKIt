@@ -61,7 +61,8 @@ typedef enum {
     UNSEAL_SERVER_KEY_ERROR,                // 48
     RESULT_BUFFER_OVERFLOW_ERROR,           // 49
     PUBLICATION_ENCLAVE_ERROR,              // 50
-    DATA_VALIDITY_ERROR                     // 51
+    DATA_VALIDITY_ERROR,                    // 51
+    EMPTY_RESULT_ERROR                      // 52
 } server_error_t;
 
 std::string get_error_message(server_error_t error);

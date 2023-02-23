@@ -31,6 +31,8 @@ server_error_t publish_db(char* time, char* pk, char* type, char* data, uint32_t
 
     server_error_t ret = database_write(db, data_for_writing);
     free(data_for_writing.encrypted);
+    sqlite3_close(db);
+    
     return ret;
 }
 

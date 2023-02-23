@@ -8,6 +8,7 @@
 #include "string.h"
 #include "sgx_tcrypto.h"
 #include "server_enclave_t.h"
+#include <vector>
 
 // Implemented in "server_enclave_t.h"
 // void ocall_query_db(int* p_ret, char* command, uint32_t index, char* data, uint32_t* p_data_size);
@@ -132,14 +133,14 @@ server_error_t enclave_verify_permissions(
 
     int i = 0;
     char* token = strtok_r(text, "|", &text);
-    while (token != NULL && *accepted == 0)
+    while (token != NULL && *accepted == false)
     {
         i++;
         token = strtok_r(NULL, "|", &text);
  
         if (i == 9+2*permission_count) {
             if(!memcmp(token, pk, 8))
-                *accepted = 1;
+                *accepted = true;
             permission_count++;
         }
     }
@@ -259,11 +260,9 @@ server_error_t enclave_multi_query_db(
     uint8_t* key,
     char* command, 
     uint32_t command_size,
-    char** datas, 
-    uint32_t* datas_sizes, 
-    uint32_t* p_data_count) 
+    std::vector<std::string>& datas) 
 {
-    uint32_t max_data_size = 1024; 
+    uint32_t max_data_size = 2048; 
     uint32_t max_data_count = 10;
     char** stored_datas = (char**)malloc(sizeof(char*)*max_data_count);
     uint32_t* stored_datas_sizes = (uint32_t*)malloc(sizeof(uint32_t)*max_data_count); 
@@ -271,9 +270,10 @@ server_error_t enclave_multi_query_db(
     // OCALL 
     //ocall_print_string("\nI will call ocall_multi_query_db()");
     int ret = (int)OK; 
-    uint32_t data_count;
+    uint32_t data_count = 0;
     ocall_multi_query_db(&ret, command, command_size, stored_datas, stored_datas_sizes, &data_count);
     if(ret) return (server_error_t)ret;
+    //ocall_print_number((long)data_count);
 
     uint32_t max_encrypted_size = 1024;
     uint32_t max_plain_data_size = 1024; 
@@ -310,11 +310,8 @@ server_error_t enclave_multi_query_db(
             return (server_error_t)ret;
 
         if(accepted) {
-            memcpy(datas[*p_data_count], plain_data, plain_data_size);
-            datas_sizes[*p_data_count] = plain_data_size;
-            //ocall_print_string((const char*) datas[*p_data_count]);
-            //ocall_print_number((long)plain_data_size);
-            (*p_data_count)++;
+            datas.push_back(std::string((char*)plain_data));
+            //ocall_print_string((const char*)datas[datas.size()-1].c_str());
         }
 
         memset(encrypted, 0, max_encrypted_size);

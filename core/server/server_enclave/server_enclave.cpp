@@ -162,6 +162,11 @@ sgx_status_t enclave_publication_wrapper(
         memcpy(result_payload, payload, payload_size);
     }
     
+    if(result_payload_size == 0) {
+        *p_error_code = EMPTY_RESULT_ERROR;
+        return ret;
+    }
+
     if(debug) ocall_print_string("\nGet access permissions fields inside decrypted");
 
     uint32_t permissions_size = 255;

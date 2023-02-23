@@ -184,6 +184,10 @@ std::string get_error_message(server_error_t error) {
         case DATA_VALIDITY_ERROR:
         return std::string("Invalid data retrived from database");
         break;
+                          
+        case EMPTY_RESULT_ERROR:
+        return std::string("Empty result payload");
+        break;
 
         default:
         return std::string("Unknown error");
