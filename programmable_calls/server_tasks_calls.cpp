@@ -40,10 +40,6 @@ server_error_t aggregation
     server_error_t ret = enclave_multi_query_db(pk, storage_key, payload, payload_size, datas);
     if(ret) return ret;
 
-    // DEBUG
-    for(unsigned j=0;j<datas.size();j++)
-        ocall_print_string((const char*)datas[j].c_str());
-
     uint32_t stored_payload_size = 128;
     char stored_payload[stored_payload_size];
     memset(stored_payload, 0, stored_payload_size);

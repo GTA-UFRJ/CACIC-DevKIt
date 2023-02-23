@@ -125,18 +125,19 @@ server_error_t enclave_verify_permissions(
 {
     // Get permissions and verify if querier is included
     // time|2012-05-06.21:47:59|pk|72d41281|type|123456|payload|250|permission1|72d41281
-    char* text = (char*)malloc(1+(size_t)decrypted_len);
+    char text [1+(size_t)decrypted_len];
     memcpy(text, decrypted, decrypted_len);
     text[decrypted_len] = '\0';
     
     int permission_count = 0;
 
     int i = 0;
-    char* token = strtok_r(text, "|", &text);
+    char* consumed_text = (char*)text;
+    char* token = strtok_r(consumed_text, "|", &consumed_text);
     while (token != NULL && *accepted == false)
     {
         i++;
-        token = strtok_r(NULL, "|", &text);
+        token = strtok_r(NULL, "|", &consumed_text);
  
         if (i == 9+2*permission_count) {
             if(!memcmp(token, pk, 8))
@@ -144,7 +145,7 @@ server_error_t enclave_verify_permissions(
             permission_count++;
         }
     }
-    free(text);
+
     return OK;
 }
 
@@ -154,6 +155,13 @@ server_error_t enclave_get_encrypted(
     uint8_t* encrypted, 
     uint32_t* p_encrypted_size) 
 {
+    /*
+    char test[70];
+    memcpy(test, data, 69);
+    test[69] = 0;
+    ocall_print_string((const char*)test);
+    */
+
     unsigned i = 0;
     char* invalid_char;
     uint32_t encrypted_size;
@@ -263,7 +271,7 @@ server_error_t enclave_multi_query_db(
     std::vector<std::string>& datas) 
 {
     uint32_t max_data_size = 2048; 
-    uint32_t max_data_count = 256;
+    uint32_t max_data_count = 10;
     char** stored_datas = (char**)malloc(sizeof(char*)*max_data_count);
     uint32_t* stored_datas_sizes = (uint32_t*)malloc(sizeof(uint32_t)*max_data_count); 
 
@@ -272,7 +280,6 @@ server_error_t enclave_multi_query_db(
     uint32_t data_count = 0;
     ocall_multi_query_db(&ret, command, command_size, stored_datas, stored_datas_sizes, &data_count);
     if(ret) return (server_error_t)ret;
-    //ocall_print_number((long)data_count);
 
     uint32_t max_encrypted_size = 1024;
     uint32_t max_plain_data_size = 1024; 
@@ -281,9 +288,9 @@ server_error_t enclave_multi_query_db(
     uint8_t encrypted[max_encrypted_size];
     memset(encrypted, 0, max_encrypted_size);
 
+    uint32_t plain_data_size = max_plain_data_size;
     uint8_t plain_data[max_plain_data_size];
     memset(plain_data, 0, max_plain_data_size);
-    uint32_t plain_data_size = max_plain_data_size;
 
     bool accepted = false;
     data_count = data_count > max_data_count ? max_data_count : data_count;
@@ -305,15 +312,18 @@ server_error_t enclave_multi_query_db(
         if(memcmp(stored_datas[i]+40, plain_data+28, 8)) 
             return DATA_VALIDITY_ERROR;
 
+        //ocall_print_number((long)plain_data_size);
+        //ocall_print_string((const char*)plain_data);
+        
         ret = (int) enclave_verify_permissions(plain_data, plain_data_size, pk, &accepted);
         if(ret) 
             return (server_error_t)ret;
 
-        if(accepted) {
+        if(accepted)
             datas.push_back(std::string((char*)plain_data));
-            //ocall_print_string((const char*)datas[datas.size()-1].c_str());
-        }
-
+        
+        encrypted_size = max_encrypted_size;
+        plain_data_size = max_plain_data_size;
         memset(encrypted, 0, max_encrypted_size);
         memset(plain_data, 0, max_plain_data_size);
         accepted = false;
