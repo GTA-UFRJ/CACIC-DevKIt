@@ -81,7 +81,7 @@ int client_register(client_identity_t rcv_id) {
     memset(formatted_msg, 0, formatted_msg_size+1);
     sprintf(formatted_msg,"pk|%s|ck|", rcv_id.pk);
 
-    convert_buffer_to_text(rcv_id.comunication_key, 16, formatted_msg, NULL);
+    convert_buffer_to_text(rcv_id.comunication_key, 16, formatted_msg+strlen(formatted_msg), NULL);
     printf("%s\n", formatted_msg);
 
     // Send message to server

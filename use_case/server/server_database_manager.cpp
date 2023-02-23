@@ -29,6 +29,9 @@ void free_callback_arg(callback_arg_t callback_arg) {
 static int callback_query(void* received_from_exec, int num_columns, char** columns_values, char ** columns_names) {
     
     callback_arg_t* received_from_exec_tranformed = (callback_arg_t*)received_from_exec;
+    
+    if(received_from_exec_tranformed->data_count >= MAX_NUM_DATAS_QUERIED)
+        return 0;
 
     // database_read only allocated the array. Now we will allocate memory for the string at the selected position
     char* new_data = (char*)malloc(MAX_DATA_SIZE*sizeof(char)); 
@@ -74,7 +77,7 @@ static int callback_query(void* received_from_exec, int num_columns, char** colu
     received_from_exec_tranformed->datas[received_from_exec_tranformed->data_count] = new_data;
     received_from_exec_tranformed->datas_sizes[received_from_exec_tranformed->data_count] = 69+encrypted_size;
     received_from_exec_tranformed->data_count++;
-    
+
     return 0;
 }
 

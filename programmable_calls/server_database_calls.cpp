@@ -57,18 +57,20 @@ server_error_t query_db(char* command, uint32_t index, char* data, uint32_t* p_d
 
     uint32_t filtered_data_count;
     if(ret = database_read(db, command, datas, datas_sizes, &filtered_data_count)) {
-        free_data_array(datas, datas_sizes, MAX_NUM_DATAS_QUERIED);
+        free_data_array(datas, datas_sizes, filtered_data_count);
         return print_error_message(DB_SELECT_EXECUTION_ERROR);
     }
+    printf("%u\n", filtered_data_count);
 
     // Get data at index
     if(index >= filtered_data_count) {
-        free_data_array(datas, datas_sizes, MAX_NUM_DATAS_QUERIED);
+        free_data_array(datas, datas_sizes, filtered_data_count);
         return print_error_message(OUT_OF_BOUND_INDEX);
     }
 
     memcpy(data, datas[index], datas_sizes[index]);
-    free_data_array(datas, datas_sizes, MAX_NUM_DATAS_QUERIED);
+    printf("%s\n", data);
+    free_data_array(datas, datas_sizes, filtered_data_count);
 
     return OK;
 }

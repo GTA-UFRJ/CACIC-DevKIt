@@ -35,20 +35,10 @@ server_error_t aggregation
  uint8_t* result,
  uint32_t* p_result_size)
 {
-    /*
-    char** datas = (char**)malloc(sizeof(char*)*max_data_count);
-    uint32_t* datas_sizes = (uint32_t*)malloc(sizeof(uint32_t)*max_data_count); 
-    for(unsigned i = 0; i < max_data_count; i++)
-        datas[i] = (char*)malloc(max_data_size);
-    */
-
    std::vector<std::string> datas;
 
     server_error_t ret = enclave_multi_query_db(pk, storage_key, payload, payload_size, datas);
-    if(ret) {
-        //enclave_free_data_array(datas, datas_sizes, max_data_count);
-        return ret;
-    }
+    if(ret) return ret;
 
     // DEBUG
     for(unsigned j=0;j<datas.size();j++)
@@ -66,23 +56,17 @@ server_error_t aggregation
     {
         memset(stored_payload, 0, stored_payload_size);
         ret = enclave_get_payload((uint8_t*)(datas[i].c_str()), datas[i].length(), stored_payload, &stored_payload_size); 
-        if(ret) {
-            //enclave_free_data_array(datas, datas_sizes, max_data_count);
-            return ret;
-        }
-
+        if(ret) return ret;
+        
         numeric_payload = strtoul(stored_payload, &invalid_char, 10);
                     
-        if(stored_payload != 0 && *invalid_char == 0) {
+        if(stored_payload != 0 && *invalid_char == 0)
             total += numeric_payload;
-        }
     }
 
     std::string total_string = std::to_string(total);
     *p_result_size = total_string.length();
     memcpy(result, total_string.c_str(), *p_result_size);
-
-    //enclave_free_data_array(datas, datas_sizes, max_data_count);
     
     return OK;
 }

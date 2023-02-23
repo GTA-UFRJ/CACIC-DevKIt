@@ -263,12 +263,11 @@ server_error_t enclave_multi_query_db(
     std::vector<std::string>& datas) 
 {
     uint32_t max_data_size = 2048; 
-    uint32_t max_data_count = 10;
+    uint32_t max_data_count = 256;
     char** stored_datas = (char**)malloc(sizeof(char*)*max_data_count);
     uint32_t* stored_datas_sizes = (uint32_t*)malloc(sizeof(uint32_t)*max_data_count); 
 
     // OCALL 
-    //ocall_print_string("\nI will call ocall_multi_query_db()");
     int ret = (int)OK; 
     uint32_t data_count = 0;
     ocall_multi_query_db(&ret, command, command_size, stored_datas, stored_datas_sizes, &data_count);
@@ -287,6 +286,7 @@ server_error_t enclave_multi_query_db(
     uint32_t plain_data_size = max_plain_data_size;
 
     bool accepted = false;
+    data_count = data_count > max_data_count ? max_data_count : data_count;
 
     for(unsigned i=0; i<data_count; i++) {
 
