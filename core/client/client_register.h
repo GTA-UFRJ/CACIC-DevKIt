@@ -13,7 +13,15 @@
 // Send data for publication
 int send_registration(char* snd_msg);
 
-// Receive plaintext data, encrypt and send to server for publishing
+/*
+    Build registration message and send to server
+
+    Parameters:
+    client_identity_t rcv_id: structure defined in client.h with the ID and CK
+
+    Return:
+    Numeric code indicating the error accordingly to errors.h 
+*/
 int client_register(client_identity_t rcv_id);
 
 #endif

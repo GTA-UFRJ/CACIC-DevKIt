@@ -11,12 +11,14 @@
 #include <string.h>
 #include <sqlite3.h>
 
+// Program functions for database interface in this file
+
 server_error_t publish_db(char* time, char* pk, char* type, char* data, uint32_t data_size) 
 {
     iot_message_t data_for_writing;
     memcpy(data_for_writing.time, time, 20);
     memcpy(data_for_writing.pk, pk, 9);
-    sprintf(data_for_writing.type, type);
+    memcpy(data_for_writing.type, type, 7);
     data_for_writing.encrypted_size = data_size; // does not includes /n
     data_for_writing.encrypted = (uint8_t*)malloc(data_size);
     memcpy(data_for_writing.encrypted, data, data_size);
@@ -36,7 +38,7 @@ server_error_t publish_db(char* time, char* pk, char* type, char* data, uint32_t
     return ret;
 }
 
-server_error_t query_db(char* command, uint32_t index, char* data, uint32_t* p_data_size) 
+server_error_t query_db(char* command, uint32_t index, char* data, uint32_t* ) 
 {
     int ret = 0;
     
@@ -56,7 +58,7 @@ server_error_t query_db(char* command, uint32_t index, char* data, uint32_t* p_d
     } 
 
     uint32_t filtered_data_count;
-    if(ret = database_read(db, command, datas, datas_sizes, &filtered_data_count)) {
+    if((ret = database_read(db, command, datas, datas_sizes, &filtered_data_count))) {
         free_data_array(datas, datas_sizes, filtered_data_count);
         return print_error_message(DB_SELECT_EXECUTION_ERROR);
     }
@@ -86,7 +88,7 @@ server_error_t multi_query_db(char* command, char** datas, uint32_t* datas_sizes
        return print_error_message(OPEN_DATABASE_ERROR);
     } 
 
-    if(ret = database_read(db, command, datas, datas_sizes, p_data_count))
+    if((ret = database_read(db, command, datas, datas_sizes, p_data_count)))
         return print_error_message(DB_SELECT_EXECUTION_ERROR);
         
     return OK;

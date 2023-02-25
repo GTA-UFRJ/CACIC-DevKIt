@@ -72,7 +72,7 @@ void ocall_query_db(int* p_ret, char* command, uint32_t index, char* data, uint3
 void ocall_multi_query_db(
     int* p_ret, 
     char* command, 
-    uint32_t command_size, 
+    uint32_t ,              // command_size
     char** datas, 
     uint32_t* datas_sizes, 
     uint32_t* p_data_count) 
@@ -207,14 +207,14 @@ server_error_t server_publish(const Request& req, Response& res, sgx_enclave_id_
 
     uint32_t querier_seald_size;
     uint8_t* querier_sealed_data = (uint8_t*)malloc(SEALED_SIZE);
-    if(ret = read_user_key_file(rcv_msg.pk, querier_sealed_data, &querier_seald_size)){
+    if((ret = read_user_key_file(rcv_msg.pk, querier_sealed_data, &querier_seald_size))){
         free(querier_sealed_data);
         return ret;
     }
 
     uint32_t storage_sealed_size;
     uint8_t* storage_sealed_data = (uint8_t*)malloc(SEALED_SIZE);
-    if(ret = read_storage_key_file(rcv_msg.pk, storage_sealed_data, &storage_sealed_size)){
+    if((ret = read_storage_key_file(rcv_msg.pk, storage_sealed_data, &storage_sealed_size))){
         free(querier_sealed_data);
         free(storage_sealed_data);
         return ret;
@@ -254,7 +254,7 @@ server_error_t server_publish(const Request& req, Response& res, sgx_enclave_id_
         else return print_error_message(PUBLICATION_ENCLAVE_ERROR);
     }
     
-    if(ret = publish_db(rcv_msg.time, rcv_msg.pk, rcv_msg.type, processed_data, processed_data_size)){
+    if((ret = publish_db(rcv_msg.time, rcv_msg.pk, rcv_msg.type, processed_data, processed_data_size))){
         free(processed_data);
         return print_error_message(ret); 
     }

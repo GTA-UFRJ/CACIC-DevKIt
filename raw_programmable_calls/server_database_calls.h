@@ -7,7 +7,6 @@
 #ifndef _SERVER_DATABASE_CALLS_
 #define _SERVER_DATABASE_CALLS_
 
-#include <sqlite3.h>
 #include "config_macros.h"
 #include "errors.h"
 

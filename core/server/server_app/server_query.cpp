@@ -41,7 +41,6 @@ server_error_t parse_query(char* msg, access_message_t* p_rcv_msg)
 
     char* token = strtok_r(msg, "|", &msg);
     int i = 0;
-    char auxiliar[3];
     char* invalid_char;
     while (token != NULL)
     {
@@ -141,14 +140,14 @@ server_error_t get_response(stored_data_t stored,
 
     uint8_t* querier_sealed_data = (uint8_t*)malloc(SEALED_SIZE);
     uint32_t querier_seald_size;
-    if(ret = read_user_key_file(rcv_msg.pk, querier_sealed_data, &querier_seald_size)){
+    if((ret = read_user_key_file(rcv_msg.pk, querier_sealed_data, &querier_seald_size))){
         free(querier_sealed_data);
         return ret;
     }
 
     uint8_t* storage_sealed_data = (uint8_t*)malloc(SEALED_SIZE);
     uint32_t storage_sealed_size;
-    if(ret = read_storage_key_file(rcv_msg.pk, storage_sealed_data, &storage_sealed_size)){
+    if((ret = read_storage_key_file(rcv_msg.pk, storage_sealed_data, &storage_sealed_size))){
         free(querier_sealed_data);
         free(storage_sealed_data);
         return ret;
@@ -229,7 +228,7 @@ server_error_t server_query(const Request& req, Response& res, sgx_enclave_id_t 
     // Query data from db
     char* data = (char*)malloc(MAX_DATA_SIZE);
     uint32_t data_size;
-    if(ret = query_db(rcv_msg.command, rcv_msg.index, data, &data_size)){
+    if((ret = query_db(rcv_msg.command, rcv_msg.index, data, &data_size))){
        free(data);
        return ret; 
     }

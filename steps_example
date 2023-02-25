@@ -1,0 +1,28 @@
+Server instalation
+bash install-server.sh ~/sgxsdk/environment ~/cpp-httplib/ 192.168.0.47 8080
+
+
+GUI installation
+bash install-gui.sh ~/cpp-httplib/ 192.168.0.50 8080 192.168.0.47 8080
+
+
+Secure erver startup
+./Server s
+
+
+GUI startup
+./CACIC-GUI
+
+
+User equipment (this PC) identity
+ID = 1234abcd
+CK = 00000000000000000000000000000000
+
+
+AP (raspberry pi) identity
+ID = 72d41281
+CK = 00000000000000000000000000000000
+
+
+Energy company identity
+ID = 83e52392

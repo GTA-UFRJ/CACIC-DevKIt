@@ -37,7 +37,7 @@ void ocall_query_db(int* p_ret, char* command, uint32_t index, char* data, uint3
 void ocall_multi_query_db(
     int* p_ret, 
     char* command, 
-    uint32_t command_size, 
+    uint32_t , 
     char** datas, 
     uint32_t* datas_sizes, 
     uint32_t* p_data_count) 

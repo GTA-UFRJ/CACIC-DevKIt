@@ -24,7 +24,7 @@ server_error_t(*task_function_t)
     char* payload: input array of size equals to payload_size with publication request
     uint32_t payload_size: size of publication request (payload)
     uint8_t* client_key: input array of size 16 bytes with communication key (CK)
-    uint8_t* storage_key: input array of size 16 bytes with storage key (SK)
+    uint8_t* storage key: input array of size 16 bytes with storage key (SK)
     uint8_t* result: output array of size *result_size with the processing result
     uint32_t* result_size: size of result
 
@@ -32,7 +32,7 @@ server_error_t(*task_function_t)
     Enumerated type defined in errors.h 
 */
 
-server_error_t aggregation
+server_error_t task_name
 (char* time,
  char* pk,
  char* payload,

@@ -115,7 +115,7 @@ server_error_t read_user_key_file(char* pk, uint8_t* key, uint32_t* p_key_size) 
 }
 
 
-server_error_t read_storage_key_file(char* pk, uint8_t* key, uint32_t* p_key_size) {
+server_error_t read_storage_key_file(char* , uint8_t* key, uint32_t* p_key_size) {
 
     if(DEBUG_TIMER) Timer t("read_storage_key_file");
 
@@ -134,5 +134,5 @@ server_error_t read_storage_key_file(char* pk, uint8_t* key, uint32_t* p_key_siz
     fread(key, 1, *p_key_size, storage_seal_file);
     fclose(storage_seal_file);
 
-
+    return OK;
 }

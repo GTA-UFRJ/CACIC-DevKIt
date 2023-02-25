@@ -108,7 +108,7 @@ server_error_t enclave_get_payload(
                 free(text);
                 return INVALID_PAYLOAD_ERROR;
             }
-            *payload_size = strlen(token);
+            *payload_size = (uint32_t)strlen(token);
             memcpy(payload, token, *payload_size+1);
         }
     }
@@ -211,7 +211,7 @@ server_error_t enclave_get_permissions(
     
     if(*p_permissions_size < strlen(p_access_permissions))
         return RESULT_BUFFER_OVERFLOW_ERROR;
-    *p_permissions_size = strlen(p_access_permissions);
+    *p_permissions_size = (uint32_t)strlen(p_access_permissions);
     strncpy(permissions, p_access_permissions, *p_permissions_size);
 
     return OK;
@@ -270,7 +270,6 @@ server_error_t enclave_multi_query_db(
     uint32_t command_size,
     std::vector<std::string>& datas) 
 {
-    uint32_t max_data_size = 2048; 
     uint32_t max_data_count = 10;
     char** stored_datas = (char**)malloc(sizeof(char*)*max_data_count);
     uint32_t* stored_datas_sizes = (uint32_t*)malloc(sizeof(uint32_t)*max_data_count); 
@@ -357,7 +356,7 @@ server_error_t enclave_build_result(
     memcpy(result+57, payload, payload_size);
     *(result + 57 + payload_size) = '|';
     memcpy(result + 57 + payload_size + 1, permissions, permissions_size);
-    *p_resullt_size = strlen((char*)result);
+    *p_resullt_size = (uint32_t)strlen((char*)result);
 
     return OK;
 }
