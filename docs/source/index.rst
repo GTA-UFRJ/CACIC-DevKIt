@@ -1,4 +1,4 @@
-Title CACIC-DevKit
+CACIC-DevKit
 =====
 
 .. image:: images/logo_cacic_white.png
