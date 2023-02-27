@@ -1,3 +1,6 @@
+Title CACIC-DevKit
+=====
+
 .. image:: images/logo_cacic_white.png
 
 CACIC-DevKit provides a way for developers to create IoT systems with a highly-secure 
