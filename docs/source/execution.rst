@@ -3,24 +3,32 @@ Execution
 
 To initialize the server process, run the command:
 
-.. prompt:: bash $
-./Server 
+.. code-block:: shell
+        :name: server_command
+
+        ./Server 
 
 
 To open the client CLI tool help, run the command:
 
-.. prompt:: bash $
-./Client
+.. code-block:: shell
+        :name: client_command
+
+        ./Client
 
 The help includes examples for publishing data to and querying data from the server.  
 
 To initialize an access point, run the command 
-.. prompt:: bash $
-    ./Client ap_init
+.. code-block:: shell
+        :name: ap_init
+
+        ./Client ap_init
 
 To open the client GUI tool, run the command:
-.. prompt:: bash $
-    ./CACIC-GUI
+.. code-block:: shell
+        :name: cacic_gui
+
+        ./CACIC-GUI
 
 Before sending publication and query messages, it is necessary to configure the client. 
 The required steps can be done using the CLI or GUI tools, as follows:
