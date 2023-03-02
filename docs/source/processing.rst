@@ -1,5 +1,5 @@
 Isolated Processing Tasks
-===============
+=========================
 
 The next step to developing an IoT system using CACIc-DevKit is programming the 
 processing tasks. Each :doc:`publication request type </client>` can have its own 
@@ -8,16 +8,17 @@ publication message is received. The developer can program C/C++ codes with the
 following structure:
 
 .. code-block:: c++
-   :caption: piece of programmable_calls/server_tasks_calls.h
-    server_error_t task_name
-    (char* time,
-     char* pk,
-     char* payload,
-     uint32_t payload_size,
-     uint8_t* client_key,
-     uint8_t* storage_key,
-     uint8_t* result,
-     uint32_t* p_result_size);
+        :name: piece of programmable_calls/server_tasks_calls.h
+        
+        server_error_t task_name
+        (char* time,
+        char* pk,
+        char* payload,
+        uint32_t payload_size,
+        uint8_t* client_key,
+        uint8_t* storage_key,
+        uint8_t* result,
+        uint32_t* p_result_size);
 
 The parameters are the following:
 
@@ -50,8 +51,9 @@ For associating data types with processing tasks, the developer must access the 
 ``programmable_calls/server_tasks_calls.cpp`` and modify the following line:
 
 .. code-block:: c++
-   :caption: piece of programmable_calls/server_tasks_calls.cpp
-    std::vector<task_function_t> tasks{NULL, &aggregation};
+        :name: piece of programmable_calls/server_tasks_calls.cpp
+        
+        std::vector<task_function_t> tasks{NULL, &aggregation};
 
 The first i-th vector represents a pointer to a function that implements the processing task 
 corresponding to the i-th publication request type in the ``types`` vector, defined in the 
@@ -65,8 +67,9 @@ that can be used in the processing tasks. As an example, we may use the followin
 ``aggregation()``:
 
 .. code-block:: c++
-   :caption: piece of programmable_calls/server_tasks_calls.cpp
-    server_error_t enclave_multi_query_db(
+        :name: piece_of_programmable_calls/server_tasks_calls_2.cpp
+        
+        server_error_t enclave_multi_query_db(
         char* pk,
         uint8_t* key,
         char* command, 

@@ -25,15 +25,16 @@ As you can see, the developer can implement the use case by modularizing the app
 using its own files. In that case, it should define rules to compile these files. For the 
 smart grid use case, some receipts were added to the build.make file, as follows:
 
-.. code-block:: make
-   :caption: piece of build.make
-    use_case/server/server_database_manager.o: use_case/server/server_database_manager.cpp core/utils/utils.cpp
-    	@$(CXX) $(SGX_COMMON_CXXFLAGS) $(Server_Cpp_Flags) -c $< -o $@
-    	@echo "CXX  <=  $<"
+.. code-block:: makefile
+				:name: piece of build.make
 
-    use_case/client/%.o: use_case/client/%.cpp  
-    	@$(CXX) $(Client_Cpp_Flags) -c $< -o $@
-    	@echo "CXX  <=  $<"
+				use_case/server/server_database_manager.o: use_case/server/server_database_manager.cpp core/utils/utils.cpp
+					@$(CXX) $(SGX_COMMON_CXXFLAGS) $(Server_Cpp_Flags) -c $< -o $@
+					@echo "CXX  <=  $<"
+
+				use_case/client/%.o: use_case/client/%.cpp  
+					@$(CXX) $(Client_Cpp_Flags) -c $< -o $@
+					@echo "CXX  <=  $<"
 
 .. note:: this section does not describes the graphical user interface building procedure. 
     It involves using cmake to generate a .pro file and a Makefile. This is the default 

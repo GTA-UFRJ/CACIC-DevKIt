@@ -8,12 +8,11 @@ server core can call the following four functions, defined in the file
 ``programmable_calls/server_database_calls.h``:
 
 .. code-block:: c++
-   :caption: piece of programmable_calls/server_database_calls.h
+        :caption: piece of programmable_calls/server_database_calls.h
 
-    server_error_t publish_db(char* time, char* pk, char* type, char* data, uint32_t data_size);
-    server_error_t query_db(char* command, uint32_t index, char* data, uint32_t* p_data_size);
-    server_error_t multi_query_db(char* command, char** datas, uint32_t* datas_sizes, uint32_t* p_data_count);
-
+        server_error_t publish_db(char* time, char* pk, char* type, char* data, uint32_t data_size);
+        server_error_t query_db(char* command, uint32_t index, char* data, uint32_t* p_data_size);
+        server_error_t multi_query_db(char* command, char** datas, uint32_t* datas_sizes, uint32_t* p_data_count);
 
 The developer must program the four functions in the file 
 ``programmable_calls/server_database_calls.cpp`` accordingly to the use case 
