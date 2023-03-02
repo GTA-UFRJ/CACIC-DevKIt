@@ -18,5 +18,6 @@ and change the following line to include the numeric code of the types (the orde
 as we will describe in :doc:`processing`):
 
 .. code-block:: c++
-   :caption: piece of programmable_calls/server_tasks_calls.cpp
-    std::vector<const char*> types{"123456", "555555"};
+        :caption: piece of programmable_calls/server_tasks_calls.cpp
+
+        std::vector<const char*> types{"123456", "555555"};
