@@ -1,13 +1,13 @@
 About CACIC
 =================
 
-.. image:: images/architecture.png
-
 CACIC is an architecture that allows clients to customize access permissions for its 
 IoT data in clouds. By leveraging isolated memory enclaves, CACIC can achieve security 
 even if the operating system or cloud administrator try to act maliciously. In CACIC, 
 each client has its public ``ID`` and 128-bit secret key (``CK``), shared with an 
-enclave after attesting its security. 
+enclave after attesting its security.
+
+.. image:: images/arquitetura_ingles.png
 
 Publication messages
 ----------------------
