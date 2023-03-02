@@ -6,10 +6,10 @@ CACIC Publication API
 For sending a publication message to the server, one can use the following function, 
 defined in ``core/client/client_publish.h`` and implemented in ``core/client/client_publish.cpp``:
 
-.. code-block:: c++
-        :name: piece of core/client/client_publish.h
-        
-        int client_publish(uint8_t* key, client_data_t data);
+\*:name: piece of core/client/client_publish.h*\
+```c++       
+int client_publish(uint8_t* key, client_data_t data);
+```
 
 ``client_data_t`` structure is defined in ``core/client/client.h``, as follows:
 
