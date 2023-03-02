@@ -39,7 +39,7 @@ The required steps can be done using the CLI or GUI tools, as follows:
 * Choose a 32-characters (0-9 and a-f) Client Communication Key (CK)
 * With the server running, register the client 
 
-.. note:: in a production environment, this key must be sent to the enclave after attestation 
+.. note:: In a production environment, this key must be sent to the enclave after attestation 
     using an encrypted channel. Intel offers code samples for remote attestation. One can 
     attest a remote enclave, that can transfer the data to other local enclaves, for example. 
-    For reference, access the SGX examples._
+    For reference, access the SGX examples.
