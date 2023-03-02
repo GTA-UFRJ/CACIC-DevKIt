@@ -27,7 +27,7 @@ defined in ``core/client/client_publish.h`` and implemented in ``core/client/cli
           char** permissions_list;
         } client_data_t;
 
-The developer is free to choose the way the :doc:`IDAULBERTO </about>` (``pk`` field in 
+The developer is free to choose the way the :doc:`identification (ID) </about>` (``pk`` field in 
 the structure): and the :doc:`communication key </about>` (CK, ``key`` argument in 
 the function) is stored. The use case gives an implementation example, based on using 
 a file (``use_case/database/identity``) to store the concatenation between ID and CK.
