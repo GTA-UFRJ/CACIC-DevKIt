@@ -1,1 +1,5 @@
-extensions = ['sphinx.ext.autosectionlabel']
+extensions = ['sphinx.ext.autosectionlabel'] = {}
+
+html_theme_options = {
+  'logo_name' = CACIC-Dev-Kit
+}
