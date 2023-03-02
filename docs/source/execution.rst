@@ -18,13 +18,15 @@ To open the client CLI tool help, run the command:
 
 The help includes examples for publishing data to and querying data from the server.  
 
-To initialize an access point, run the command 
+To initialize an access point, run the command:
+
 .. code-block:: shell
         :name: ap_init
 
         ./Client ap_init
 
 To open the client GUI tool, run the command:
+
 .. code-block:: shell
         :name: cacic_gui
 
