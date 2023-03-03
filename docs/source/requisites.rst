@@ -36,7 +36,7 @@ following GitHub repositories:
 * `CACIC-DevKit <https://github.com/GTA-UFRJ/CACIC-Dev-KIt>`_
 * `cpp-httplib <https://github.com/yhirose/cpp-httplib>`_
 
-For running the :doc:`</docs/source/demonstration>`, you may also install:
+For running the :doc:`demonstration </demonstration>`, you may also install:
 
 * `SQLite 3 <https://www.sqlite.org/download.html>`_
 * `CMake <https://cmake.org/download/>`_
