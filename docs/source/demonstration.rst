@@ -3,8 +3,7 @@ Demonstration
 
 The following four components are necessary to run our demo:
 
-* A Smart Meter (SM) that periodicaly sends measurements HTTP consumption data 
-* (in kwh) as follows::
+* A Smart Meter (SM) that periodicaly sends measurements HTTP consumption data (in kwh) as follows::
 
 ```http://[access_point_url]:5555/smart-meter=[payload]```
 
