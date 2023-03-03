@@ -15,7 +15,7 @@ In the smart grid use case, we have defined two publication requests types:
 
 For defining the publication types, open the file ``programmable_calls/server_tasks_calls.cpp`` 
 and change the following line to include the numeric code of the types (the order will matter, 
-as we will describe in :doc:`</processing>`):
+as we will describe in :doc:`processing </processing>`):
 
 .. code-block:: c++
         :name: piece of programmable_calls/server_tasks_calls.cpp
