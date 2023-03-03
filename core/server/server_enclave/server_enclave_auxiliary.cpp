@@ -208,9 +208,13 @@ server_error_t enclave_get_permissions(
         token = strtok_r(NULL, "|", &p_access_permissions);
         i++;
     }
+
+    if(p_access_permissions == NULL)
+        return EMPTY_PERMISSIONS_ERROR;
     
     if(*p_permissions_size < strlen(p_access_permissions))
         return RESULT_BUFFER_OVERFLOW_ERROR;
+    
     *p_permissions_size = (uint32_t)strlen(p_access_permissions);
     strncpy(permissions, p_access_permissions, *p_permissions_size);
 
@@ -218,6 +222,7 @@ server_error_t enclave_get_permissions(
 }
 
 server_error_t enclave_query_db(
+    char* pk,
     uint8_t* key,
     char* command,
     uint32_t index,
@@ -242,6 +247,14 @@ server_error_t enclave_query_db(
     sgx_status_t sgx_ret = enclave_decrypt_data(key, encrypted, encrypted_size, plain_data);
     if(sgx_ret != SGX_SUCCESS) 
         return DATA_DECRYPTION_ERROR;
+
+    bool accepted = false;
+    ret = (int) enclave_verify_permissions(plain_data, plain_data_size, pk, &accepted);
+    if(ret) 
+        return (server_error_t)ret;
+    
+    if(!accepted)
+        return ACCESS_DENIED;
     
     *p_data_size = plain_data_size+1;
     memcpy(data, plain_data, plain_data_size);

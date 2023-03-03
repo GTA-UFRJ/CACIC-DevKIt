@@ -44,10 +44,6 @@ server_error_t query_db(char* command, uint32_t index, char* data, uint32_t* )
     
     char** datas = (char**)malloc(sizeof(char*)*MAX_NUM_DATAS_QUERIED);
     uint32_t* datas_sizes = (uint32_t*)malloc(sizeof(uint32_t)*MAX_NUM_DATAS_QUERIED); 
-    /*
-    for(unsigned i = 0; i < MAX_NUM_DATAS_QUERIED; i++)
-        datas[i] = (char*)malloc(MAX_DATA_SIZE);
-    */
 
     // Database connection 
     sqlite3 *db;
@@ -57,7 +53,7 @@ server_error_t query_db(char* command, uint32_t index, char* data, uint32_t* )
        return print_error_message(OPEN_DATABASE_ERROR);
     } 
 
-    uint32_t filtered_data_count;
+    uint32_t filtered_data_count = 0;
     if((ret = database_read(db, command, datas, datas_sizes, &filtered_data_count))) {
         free_data_array(datas, datas_sizes, filtered_data_count);
         return print_error_message(DB_SELECT_EXECUTION_ERROR);
@@ -72,7 +68,8 @@ server_error_t query_db(char* command, uint32_t index, char* data, uint32_t* )
 
     memcpy(data, datas[index], datas_sizes[index]);
     printf("%s\n", data);
-    free_data_array(datas, datas_sizes, filtered_data_count);
+    free(datas);
+    free(datas_sizes);
 
     return OK;
 }

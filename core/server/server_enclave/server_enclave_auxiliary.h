@@ -64,7 +64,22 @@ void enclave_free_data_array(
     uint32_t* datas_sizes, 
     uint32_t data_count);
 
+/*
+    Get payload inside decrypted stored data:
+
+    Parameters:
+    char* pk: input array with 8 hex characters client ID + end of line character 
+    uint8_t* key: input array of size 16 bytes with storage key (SK)
+    char* command: input array of size command_size locating the data in the database
+    uint32_t index: numeric index for locating data
+    char* data: output array with queried data 
+    uint32_t* p_data_size: output with size of data array
+
+    Return:
+    Enumerated type defined in errors.h 
+*/
 server_error_t enclave_query_db(
+    char* pk,
     uint8_t* key,
     char* command,
     uint32_t index,

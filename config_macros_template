@@ -13,7 +13,7 @@
 #define TEST_CLIENT_URL "localhost"
 #define SERVER_URL "(SERVERURL)"
 #define SERVER_PORT (SERVERPORT)
-#define HTTPLIB_PATH "/home/guiaraujo/cpp-httplib/httplib.h"
+#define HTTPLIB_PATH "(HTTPLIB)httplib.h"
 #define SEALS_PATH "(ROOT)/core/server/resources"
 #define LATENCY_MS 0
 #define SEALED_SIZE 8192

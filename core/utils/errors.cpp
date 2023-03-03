@@ -189,6 +189,10 @@ std::string get_error_message(server_error_t error) {
         return std::string("Empty result payload");
         break;
 
+        case EMPTY_PERMISSIONS_ERROR:
+        return std::string("Empty permissions error");
+        break;
+
         default:
         return std::string("Unknown error");
         break;
