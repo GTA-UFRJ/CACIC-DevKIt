@@ -6,7 +6,7 @@ project = 'CACIC-DevKit'
 
 html_theme = 'sphinx_rtd_theme'
 
-html_logo = 'images/CACIC_logo.png'
+html_logo = 'images/texto_cacic.png'
 html_theme_options = {
     'logo_only': True
 }
