@@ -12,7 +12,7 @@ The repository can be divided into four main parts:
   core will call. These functions are programmed accordingly to the smart grid use case 
   example. In the **raw_programmable_calls** you will find just the functions templates 
   for the users to create their own systems. These functions will perform 
-  :doc:`processing tasks </processing>` and interact with the `database </database>`. 
+  :doc:`processing tasks </processing>` and interact with the :doc:`database </database>`. 
 * **use_case**: directory containing files that are only meaningful for the smart grid 
   use case example, like the user interfaces (CLI and Qt), the ESP32 firmware, the SQLite 
   database, and some auxiliary functions for the client.
