@@ -13,8 +13,7 @@ The following four components are necessary to run our demo:
    :align: center
    :alt: Smart meter photo
 
-Components
-=======================
+
 * A Linux Access Point (AP) running the process ``./Client ap_init``
 * A Linux User Equipment (UE) running the GUI (or CLI) Management Application, 
   built with the steps above
