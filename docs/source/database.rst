@@ -8,7 +8,7 @@ server core can call the following four functions, defined in the file
 ``programmable_calls/server_database_calls.h``:
 
 .. code-block:: c++
-        :caption: piece of programmable_calls/server_database_calls.h
+        :name: piece of programmable_calls/server_database_calls.h
 
         //read and write operations
         server_error_t publish_db(char* time, char* pk, char* type, char* data, uint32_t data_size);
