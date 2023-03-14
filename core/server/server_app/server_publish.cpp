@@ -196,6 +196,8 @@ server_error_t server_publish(const Request& req, Response& res, sgx_enclave_id_
         free(snd_msg);
         return ret;
     }
+
+    // Send messaget to SCONE container if data is of type 222222 or 3333333
  
     // Server receives and separate parameters according to Ultrlight protocol
     // time|2012-05-06.21:47:59|pk|72d41281|type|123456|size|62|encrypted|... 
