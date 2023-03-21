@@ -7,6 +7,7 @@ from scacic_errors import *
 from scacic_tasks_calls import *
 from scacic_disk_manager import *
 from scacic_utils import *
+from scacic_databse_calls import *
 
 class Publication:
 
@@ -54,6 +55,9 @@ class Publication:
         permissions_str = '|'.join([elem for pair in zip(prefix_list, self.permissions_list) for elem in pair])
         plain_result = "time|{}|pk|{}|type|{}|payload|{}|{}".format(self.time, self.pk, self.type, self.result_payload, permissions_str)
         self.encrypt_result(plain_result)
+
+    def publish_result(self):
+        self.error = db_publish(self.time, self.id, self.type, self.encrypted_result)
         
     def publication_request_exec(self):
 

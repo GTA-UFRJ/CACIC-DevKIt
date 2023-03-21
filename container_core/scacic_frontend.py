@@ -30,6 +30,9 @@ class Request_handler(BaseHTTPRequestHandler):
         publication.publication_request_exec()
         self.finalize_if_failed(publication)
 
+        publication.publish_result()
+        self.finalize_if_failed(publication)
+
         self.finalize()
 
 def main():

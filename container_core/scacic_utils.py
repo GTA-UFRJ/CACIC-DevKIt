@@ -6,6 +6,7 @@ from Crypto.Cipher import AES
 from scacic_macros import *
 from scacic_errors import *
 import os
+from scacic_databse_calls import *
 
 def separare_fields_encrypted(encrypted_data):
     if(len(encrypted_data) <= 16+12):
@@ -25,7 +26,6 @@ def encrypt(plaintext, key):
 
     return build_fields_encrypted(auth_tag, ciphertext, encobj.nonce), Server_error.OK
 
-
 def decrypt(encrypted_data, key):
     error_code = Server_error.OK
     
@@ -40,3 +40,9 @@ def decrypt(encrypted_data, key):
         return None, Server_error.print_error(Server_error.MESSAGE_DECRYPTION_ERROR)
 
     return plaintext, error_code
+
+def secure_query_db(command, index, id):
+    pass
+
+def secure_multi_query_db(command, id):
+    pass
