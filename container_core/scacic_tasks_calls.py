@@ -2,12 +2,12 @@
 # Author: Guilherme Araujo Thomaz
 # Descripton: function called by publciation code. Programmed by DevKit user
 
-from scacic_macros import * 
+from scacic_macros import DATABASE_PATH 
 import pandas as pd
-from scacic_errors import * 
+from scacic_errors import Server_error
 import pmdarima as pm 
 import pickle
-from scacic_utils import *
+from scacic_utils import secure_query_db
 
 # ds_name=sample_dataset_energy,start_p=1,start_q=1,test=kpss,...
 def get_payload_fields_model(payload):
@@ -69,7 +69,6 @@ def predict_energy_sarima(time, id, received_payload, ck):
     data, error = secure_query_db(command, index, id)
     if(error != Server_error.OK):
         return Server_error.print_error(Server_error.INVALID_PAYLOAD_ERROR)
-
 
     # then, we will predict the consumption 
     # finally, we will format the result as a string

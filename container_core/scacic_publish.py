@@ -3,7 +3,7 @@
 # Descripton: perform security checks before calling task
 
 import scacic_macros
-from scacic_errors import *
+from scacic_errors import Server_error
 from scacic_tasks_calls import *
 from scacic_disk_manager import *
 from scacic_utils import *
@@ -16,6 +16,7 @@ class Publication:
         self.parse_fields(message)
         if(self.succeeded()):
             self.set_encrypted_bytes()
+            self.enc_bytes = convert_text_to_bytes(self.enc_text)
             self.set_task()
         
     def parse_fields(self, message):
@@ -23,9 +24,6 @@ class Publication:
         if(len(fields_list) != 10):
             self.error = Server_error.print_error(Server_error.INVALID_ENCRYPTED_FIELD_ERROR)
         self.time, self.id, self.type, self.enc_size, self.enc_text = [fields_list[index] for index in range(len(fields_list)) if index % 2 != 0]
-    
-    def set_encrypted_bytes(self):
-        self.enc_bytes = bytes.fromhex(self.enc_text.replace('-',''))
 
     def set_task(self):  
         if(self.type not in server_functions.keys()):
@@ -37,14 +35,13 @@ class Publication:
 
     # time|...|pk|...|type|...|payload|...|permission1|...|permission2|...
     def parse_fields_decrypted(self, decrypted):
-        fields_list = decrypted.split('|')
-        if(len(fields_list) < 10):
-            self.error = Server_error.print_error(Server_error.EMPTY_PERMISSIONS_ERROR)
+        decrypted_fields, error = parse_fields_decrypted(decrypted)
+        if(self.error != Server_error.OK):
             return
-        retrieved_id, self.received_payload = [fields_list[index] for index in [3,7]]
-        if(self.id != retrieved_id):
+        self.received_payload, self.permissions_list = decrypted_fields['payload'], decrypted_fields['perms_list']
+
+        if(authenticate_client(self.id, decrypted_fields['id'])):
             self.error = Server_error.print_error(Server_error.AUTHENTICATION_ERROR)
-        self.permissions_list = [fields_list[index] for index in range(9,len(fields_list)) if index % 2 != 0]
         
     def encrypt_result(self, plain_result):
         ca = get_ca_key()
@@ -68,7 +65,7 @@ class Publication:
         decrypted, self.error = decrypt(self.enc_bytes, self.ck)
         if(self.error != Server_error.OK):
             return
-
+        
         self.parse_fields_decrypted(decrypted)
         if(self.error != Server_error.OK):
             return

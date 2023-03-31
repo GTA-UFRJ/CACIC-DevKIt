@@ -4,8 +4,8 @@
 #!/usr/bin/env python
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from scacic_publish import *
-from scacic_macros import *
+from scacic_publish import Publication
+from scacic_macros import SERVER_IP, SERVER_PORT
 
 class Request_handler(BaseHTTPRequestHandler):
 

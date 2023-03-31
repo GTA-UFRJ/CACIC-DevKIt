@@ -2,16 +2,17 @@
 # Author: Guilherme Araujo Thomaz
 # Descripton: auxiliary functions for manipualting files
 
-from scacic_macros import *
+from scacic_macros import SEALS_PATH
 from scacic_utils import *
-import os
-from scacic_errors import *
+from os import environ
+from scacic_errors import Server_error
 
 def get_ca_key():
-    ca = os.environ.get('CA', None)
-    if ca is None:
-        print("Critical Error: CA environment variable not encountered")
+    ca_text = environ.get('CA', None)
+    if ca_text is None:
+        print("Fatal Error: CA environment variable not encountered")
         exit(1) 
+    return convert_text_to_bytes(ca_text)
 
 def read_enc_ck_file(id):
     ck_path = SEALS_PATH + "/" + id

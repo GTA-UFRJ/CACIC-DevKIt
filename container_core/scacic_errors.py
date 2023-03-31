@@ -2,7 +2,7 @@
 # Author: Guilherme Araujo Thomaz
 # Descripton: errors codes
 
-from scacic_macros import *
+from scacic_macros import DEBUG
 
 class Server_error:
     OK = 0
