@@ -5,8 +5,9 @@
 from Crypto.Cipher import AES
 from scacic_errors import Server_error
 import random
-from scacic_databse_calls import db_query, db_multi_query
+from scacic_databse_calls import *
 from scacic_disk_manager import get_ca_key
+import secrets
 
 def convert_text_to_bytes(text):
     return bytes.fromhex(text.replace('-',''))
@@ -19,6 +20,9 @@ def get_random_id():
     digits = '0123456789'
     return ''.join(random.choices(digits, k=8))
 
+def get_random_nonce():
+    return secrets.token_bytes(12)
+
 def separare_fields_encrypted(encrypted_data):
     if(len(encrypted_data) <= 16+12):
         return None, None, None, Server_error.print_error(Server_error.INVALID_ENCRYPTED_FIELD_ERROR)
@@ -28,14 +32,19 @@ def separare_fields_encrypted(encrypted_data):
 def build_fields_encrypted(mac, data, nonce):
     return mac + nonce + data
 
-def encrypt(plaintext, key):
+def encrypt(plaintext, key, return_format='bytes'):
     try:    
-        encobj = AES.new(key, AES.MODE_GCM)
-        ciphertext, auth_tag = encobj.encrypt_and_digest(plaintext)
+        encobj = AES.new(key, AES.MODE_GCM, nonce=get_random_nonce())
+        ciphertext, auth_tag = encobj.encrypt_and_digest(plaintext.encode())
     except Exception as e:
+        print("Encryption error: ", e)
         return None, Server_error.print_error(Server_error.DATA_ENCRYPTION_ERROR)
 
-    return build_fields_encrypted(auth_tag, ciphertext, encobj.nonce), Server_error.OK
+    result_bytes = build_fields_encrypted(auth_tag, ciphertext, encobj.nonce)
+
+    if (return_format == 'text'):
+        return convert_bytes_to_text(result_bytes), Server_error.OK
+    return result_bytes, Server_error.OK
 
 def decrypt(encrypted_data, key, return_format='bytes'):
     auth_tag, nonce, ciphertext, error_code = separare_fields_encrypted(encrypted_data)
@@ -46,6 +55,7 @@ def decrypt(encrypted_data, key, return_format='bytes'):
         encobj = AES.new(key, AES.MODE_GCM, nonce)
         plaintext = encobj.decrypt_and_verify(ciphertext, auth_tag)
     except Exception as e:
+        print("Decryption error: ", e)
         return None, Server_error.print_error(Server_error.MESSAGE_DECRYPTION_ERROR)
 
     if(return_format == 'text'):
@@ -109,3 +119,16 @@ def secure_multi_query_db(command, id):
     return data_list, Server_error.OK
 
 #print(convert_bytes_to_text(convert_text_to_bytes("a5-23-12-f1-ab-")))
+
+if __name__ == '__main__':
+    key = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    plaintext = 'teste'
+    print("Plaintext: ", plaintext, '(%d)'%len(plaintext))
+    encrypted, error = encrypt(plaintext, key)
+    if error != Server_error.OK:
+        exit()
+    print("Encrypted: ", convert_bytes_to_text(encrypted), '(%d)'%(len(convert_bytes_to_text(encrypted))/3))
+    decrypted, error = decrypt(encrypted, key, return_format='text')
+    if error != Server_error.OK:
+        exit()
+    print("Decrypted: ", decrypted, '(%d)'%len(plaintext))
