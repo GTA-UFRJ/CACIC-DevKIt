@@ -50,11 +50,14 @@ class Publication:
     def build_result(self):
         prefix_list = ['permissions{}'.format(i+1) for i in range(len(self.permissions_list))]
         permissions_str = '|'.join([elem for pair in zip(prefix_list, self.permissions_list) for elem in pair])
-        plain_result = "time|{}|pk|{}|type|{}|payload|{}|{}".format(self.time, self.pk, self.type, self.result_payload, permissions_str)
+        plain_result = "time|{}|pk|{}|type|{}|payload|{}|{}".format(self.time, self.id, self.type, self.result_payload, permissions_str)
         self.encrypt_result(plain_result)
 
     def publish_result(self):
         self.error = db_publish(self.time, self.id, self.type, self.encrypted_result)
+
+    def execute_task(self):
+        self.result_payload, self.error = self.task_function(self.time, self.id, self.received_payload, self.ck)
         
     def publication_request_exec(self):
 
@@ -70,7 +73,7 @@ class Publication:
         if(self.error != Server_error.OK):
             return
 
-        self.result_payload, self.error = self.task_function(self.time, self.id, self.received_payload, self.ck)
+        self.execute_task()
         if(self.error != Server_error.OK):
             return
 

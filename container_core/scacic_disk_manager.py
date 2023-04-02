@@ -15,7 +15,7 @@ def get_ca_key():
     return convert_text_to_bytes(ca_text)
 
 def read_enc_ck_file(id):
-    ck_path = SEALS_PATH + "/" + id
+    ck_path = SEALS_PATH + "/" + id + "_container"
     try:
         with open(ck_path, 'rb') as f:
             encrypted_ck = f.read()
@@ -32,5 +32,7 @@ def get_ck_key(id):
 
     ca = get_ca_key()
     plain_ck, error_code = decrypt(encrypted_ck, ca)
-    return plain_ck, error_code
+    
+    #return plain_ck, error_code
+    return ca, error_code #debug
     

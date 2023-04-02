@@ -59,6 +59,7 @@ class Server_error:
     DATA_VALIDITY_ERROR = 51
     EMPTY_RESULT_ERROR = 52
     EMPTY_PERMISSIONS_ERROR = 53
+    INFERENCE_TASK_ERROR = 54
 
     def print_error(error):
         if(DEBUG and (error != Server_error.OK)):

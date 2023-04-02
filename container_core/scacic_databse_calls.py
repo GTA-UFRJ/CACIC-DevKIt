@@ -5,8 +5,8 @@
 from sqlite3 import connect
 from sqlite3 import Error as Sqlite_error
 from scacic_macros import DATABASE_PATH
-from scacic_utils import *
 from scacic_errors import Server_error
+from scacic_utils import *
 
 def create_db():
     connection = connect(DATABASE_PATH)
@@ -56,7 +56,7 @@ def correct_command(command):
         return command.replace("_", " "), Server_error.OK
 
 def convert_data_tuple_in_dict(tuple):
-    return {"time":tuple[1],"type":tuple[2],"pk":tuple[3],"size":tuple[4],"encrypted_text":convert_text_to_bytes(tuple[5])}
+    return {"time":tuple[1],"type":tuple[2],"pk":tuple[3],"size":tuple[4],"encrypted":convert_text_to_bytes(tuple[5])}
 
 def db_query(command, index):
     data_list, error = db_multi_query(command)
