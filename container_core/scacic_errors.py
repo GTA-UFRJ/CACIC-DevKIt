@@ -61,7 +61,59 @@ class Server_error:
     EMPTY_PERMISSIONS_ERROR = 53
     INFERENCE_TASK_ERROR = 54
 
+    def get_error_message():
+        pass
+
     def print_error(error):
         if(DEBUG and (error != Server_error.OK)):
             print("Error " + str(error))
+            switcher = {
+                Server_error.INIT_ERROR: "Insuficient arguments",
+                Server_error.ENCALVE_INIT_ERROR: "Failed to initialize enclave",
+                Server_error.INVALID_HTTP_MESSAGE_SIZE_FIELD_ERROR: "Failed to detect HTTP message size",
+                Server_error.HTTP_MESSAGE_SIZE_OVERFLOW_ERROR: "HTTP message bigger than the maximum size",
+                Server_error.INVALID_ENCRYPTED_SIZE_FIELD_ERROR: "Invalid encrypted size message format",
+                Server_error.INVALID_ENCRYPTED_FIELD_ERROR: "Invalid encrypted message format",
+                Server_error.OPEN_DATABASE_ERROR: "Can't open database",
+                Server_error.OPEN_CLIENT_KEY_FILE_ERROR: "Failed to open the client file",
+                Server_error.OPEN_SERVER_KEY_FILE_ERROR: "Failed to open the server file",
+                Server_error.MESSAGE_DECRYPTION_ERROR: "Error decrypting publisher message",
+                Server_error.AUTHENTICATION_ERROR: "Invalid encrypted pk. Could not authenticate client",
+                Server_error.DATA_ENCRYPTION_ERROR: "Error encrypting data for storing",
+                Server_error.ENCRYPTED_OVERFLOW_ERROR: "Insuficient memory for encrypted result",
+                Server_error.NO_PROCESSING_ENCLAVE_ERROR: "Enclave problem inside no_processing_s()",
+                Server_error.DB_INSERT_EXECUTION_ERROR: "Failed to publish message",
+                Server_error.DATA_DECRYPTION_ERROR: "Error decrypting stored data",
+                Server_error.INVALID_PAYLOAD_ERROR: "Invalid payload format",
+                Server_error.GET_DB_STATEMENT_ENCLAVE_ERROR: "Enclave problem inside get_db_request_s()",
+                Server_error.INVALID_DB_STATEMENT_ERROR: "Invalid database statement",
+                Server_error.SUM_ENCRYPTED_ENCLAVE_ERROR: "Enclave problem inside sum_encrypted_data_s()",
+                Server_error.DB_SELECT_EXECUTION_ERROR: "Failed to query message",
+                Server_error.HTTP_SEND_ERROR: "Error sending HTTP message",
+                Server_error.HTTP_RESPONSE_ERROR: "Responded with an HTTP error",
+                Server_error.CLIENT_ENCRYPTION_ERROR: "Error encrypting message for sending",
+                Server_error.CLIENT_DECRYPTION_ERROR: "Error decrypting returned message",
+                Server_error.INVALID_HTTP_RESPONSE_SIZE_FIELD_ERROR: "Failed to detect HTTP response size",
+                Server_error.HTTP_RESPONSE_SIZE_OVERFLOW_ERROR: "HTTP response bigger than the maximum size",
+                Server_error.INVALID_ENCRYPTED_RESPONSE_ERROR: "Invalid encrypted response format",
+                Server_error.OUT_OF_BOUND_INDEX: "Index out of bound",
+                Server_error.ACCESS_DENIED: "Access denied",
+                Server_error.RETRIEVE_DATA_ENCLAVE_ERROR: "Enclave problem inside retrieve_data()",
+                Server_error.INVALID_ERROR_CODE_FORMAT_ERROR: "Invalid error code formatation received",
+                Server_error.ALREDY_REGISTERED_ERROR: "Alredy registered client ID",
+                Server_error.KEY_REGISTRATION_ERROR: "Could not save client key",
+                Server_error.AP_READ_PERMS_ERROR: "Could not synchronize with access point",
+                Server_error.OPEN_CSV_FILE_ERROR: "Could not open CSV output file",
+                Server_error.WRITE_IDENTITY_FILE_ERROR: "Could not save identity",
+                Server_error.INVALID_TYPE_ERROR: "Invalid type", 
+                Server_error.PUBLICATION_ENCLAVE_ERROR: "Error inside enclave_publication_wrapper",
+                Server_error.UNSEAL_CLIENT_KEY_ERROR: "Error unsealing user key",
+                Server_error.UNSEAL_SERVER_KEY_ERROR: "Error unsealing server key",
+                Server_error.RESULT_BUFFER_OVERFLOW_ERROR: "Insuficient buffer memory to compute result",
+                Server_error.DATA_VALIDITY_ERROR: "Invalid data retrived from database",
+                Server_error.EMPTY_RESULT_ERROR: "Empty result payload",
+                Server_error.EMPTY_PERMISSIONS_ERROR: "Empty permissions error",
+            }
+            error_message = switcher.get(error, "Unknown error")
+            print(error_message)
         return error

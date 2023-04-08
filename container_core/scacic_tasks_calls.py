@@ -44,7 +44,7 @@ def generate_energy_dataframe(time, id, received_payload, ck):
     # {'Datetime': ['xxx', 'xxx', 'xxx'],
     #  'PJME_MW': ['xxx', 'xxx', 'xxx']}
     # lastly, this will be written into use_case/database as a CSV
-    print("Called generate_dataframe()")
+    print_if_debug("Called generate_dataframe()")
     path = DATASETS_ROOT + received_payload + time
     return path.replace(' ', '_').replace('.csv') + '.csv'
 
@@ -72,6 +72,7 @@ def build_energy_sarima_model(time, id, received_payload, ck):
         error_action='warn', 
         suppress_warnings=True,
         stepwise=True)
+    print_if_debug("Built SARIMA model: ", model)
     return serialize_to_string(model), Server_error.OK
 
 def predict_energy_sarima(time, id, received_payload, ck):
@@ -81,16 +82,20 @@ def predict_energy_sarima(time, id, received_payload, ck):
     payload, error = secure_query_db(command, index, id)
     if(error != Server_error.OK):
         return None, error
-
+        
     model = deserialize_from_string(payload)
+    print_if_debug("Queried model from database: ", model)
+
     result, error = perform_inference(model, num_points)
     if(error != Server_error.OK):
         return None, error
+    print_if_debug("Infered with SARIMA model: ", result)
 
     # https://stackoverflow.com/questions/1296162/how-can-i-read-a-python-pickle-database-file-from-c
     return serialize_to_string(result), Server_error.OK
     
-server_functions = {
-    '222222' : generate_energy_dataframe, 
-    '333333' : build_energy_sarima_model,
-    '444444' : predict_energy_sarima}
+def get_server_functions():
+    return {
+        '222222' : generate_energy_dataframe, 
+        '333333' : build_energy_sarima_model,
+        '444444' : predict_energy_sarima}

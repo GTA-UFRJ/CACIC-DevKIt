@@ -15,7 +15,6 @@ class Publication:
         self.error = Server_error.OK
         self.parse_fields(message)
         if(self.succeeded()):
-            self.set_encrypted_bytes()
             self.enc_bytes = convert_text_to_bytes(self.enc_text)
             self.set_task()
         
@@ -24,24 +23,28 @@ class Publication:
         if(len(fields_list) != 10):
             self.error = Server_error.print_error(Server_error.INVALID_ENCRYPTED_FIELD_ERROR)
         self.time, self.id, self.type, self.enc_size, self.enc_text = [fields_list[index] for index in range(len(fields_list)) if index % 2 != 0]
+        print_if_debug("Parsed fields: ", self.time, self.id, self.type, self.enc_size, self.enc_text)
 
     def set_task(self):  
+        server_functions = get_server_functions()
         if(self.type not in server_functions.keys()):
             self.error = Server_error.print_error(Server_error.INVALID_ENCRYPTED_FIELD_ERROR)
         self.task_function = server_functions[self.type]
+        print_if_debug("Detected task function: ", self.task_function.__name__)
 
     def succeeded(self):
         return (self.error == Server_error.OK)
 
     # time|...|pk|...|type|...|payload|...|permission1|...|permission2|...
     def parse_fields_decrypted(self, decrypted):
-        decrypted_fields, error = parse_fields_decrypted(decrypted)
+        decrypted_fields, self.error = parse_fields_decrypted(decrypted)
         if(self.error != Server_error.OK):
             return
         self.received_payload, self.permissions_list = decrypted_fields['payload'], decrypted_fields['perms_list']
 
         if(authenticate_client(self.id, decrypted_fields['id'])):
             self.error = Server_error.print_error(Server_error.AUTHENTICATION_ERROR)
+        print_if_debug("Client ", self.id, " authenticated!")
         
     def encrypt_result(self, plain_result):
         ca = get_ca_key()
@@ -51,6 +54,7 @@ class Publication:
         prefix_list = ['permissions{}'.format(i+1) for i in range(len(self.permissions_list))]
         permissions_str = '|'.join([elem for pair in zip(prefix_list, self.permissions_list) for elem in pair])
         plain_result = "time|{}|pk|{}|type|{}|payload|{}|{}".format(self.time, self.id, self.type, self.result_payload, permissions_str)
+        print_if_debug("Generated plain result payload: ", plain_result)
         self.encrypt_result(plain_result)
 
     def publish_result(self):
@@ -64,10 +68,12 @@ class Publication:
         self.ck, self.error = get_ck_key(self.id)
         if(self.error != Server_error.OK):
             return
+        print_if_debug("Retrieved client communication key: ", self.ck)
 
-        decrypted, self.error = decrypt(self.enc_bytes, self.ck)
+        decrypted, self.error = decrypt(self.enc_bytes, self.ck, return_format='text')
         if(self.error != Server_error.OK):
             return
+        print_if_debug("Decrypted message: ", decrypted)
         
         self.parse_fields_decrypted(decrypted)
         if(self.error != Server_error.OK):

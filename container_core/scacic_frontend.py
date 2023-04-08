@@ -6,6 +6,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from scacic_publish import Publication
 from scacic_macros import SERVER_IP, SERVER_PORT
+from scacic_utils import * 
 
 class Request_handler(BaseHTTPRequestHandler):
 
@@ -22,7 +23,7 @@ class Request_handler(BaseHTTPRequestHandler):
         self.end_headers() 
 
     def do_GET(self):
-        print("Received ", self.path)
+        print_if_debug("Server received ", self.path)
 
         publication = Publication(self.path)
         self.finalize_if_failed(publication)
@@ -33,10 +34,11 @@ class Request_handler(BaseHTTPRequestHandler):
         publication.publish_result()
         self.finalize_if_failed(publication)
 
+        print_if_debug("Published with success")
         self.finalize()
 
 def main():
-    print('CACIC server is starting on IP ', SERVER_IP, ' and port ', SERVER_PORT)
+    print('SCACIC server is starting on IP ', SERVER_IP, ' and port ', SERVER_PORT)
     server_address = (SERVER_IP, SERVER_PORT)
     server_handler = HTTPServer(server_address, Request_handler)
     server_handler.serve_forever()

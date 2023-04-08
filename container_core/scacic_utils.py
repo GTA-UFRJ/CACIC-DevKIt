@@ -8,6 +8,14 @@ import random
 from scacic_databse_calls import *
 from scacic_disk_manager import get_ca_key
 import secrets
+from scacic_macros import *
+
+def print_if_debug(*args):
+    if DEBUG:
+        result = ""
+        for arg in args:
+            result += str(arg)
+        print(result)
 
 def convert_text_to_bytes(text):
     return bytes.fromhex(text.replace('-',''))

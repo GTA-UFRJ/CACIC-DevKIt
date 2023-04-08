@@ -9,12 +9,21 @@ server_port = 8080
 
 connection = httplib.HTTPConnection(server_ip, server_port)
 
-bytes, _ = encrypt('arquivo_teste', get_ca_key())
-text = convert_bytes_to_text(bytes)
-request = 'time|xxxxxxxxxxxxxxxxxxx|pk|72d41281|type|222222|size|' + len(text) + '|encrypted|' + text
+f = open("./container_core/test_id_and_key", 'r')
+lines = f.readlines()
+id = lines[0].split(' ')[1][:-1]
+print("id: ",id)
+ck_text = lines[1].split(' ')[1][:-1]
+print("ck: ",ck_text)
+ck = convert_text_to_bytes(ck_text)
+
+enc_text, _ = encrypt('testing', ck, return_format='text')
+request = 'time|xxxxxxxxxxxxxxxxxxx|pk|' + id + '|type|222222|size|' + str(len(enc_text)) + '|encrypted|' + enc_text
 print(request)
 
-connection.request('GET', '/publish/size=%d/%s', len(request), request)
+complete_request = '/publish/size=' + str(len(request)) + '/' + request
+
+connection.request('GET', complete_request)
 
 response = connection.getresponse()
 
