@@ -9,6 +9,7 @@ import pmdarima as pm
 import pickle
 from scacic_utils import *
 from scacic_db_secure_interface import *
+import base64
 
 # ds_name=sample_dataset_energy,start_p=1,start_q=1,test=kpss,...
 def get_params_payload_fields_model(payload):
@@ -20,7 +21,7 @@ def get_params_payload_fields_model(payload):
 
 def get_dataset(csv_name):
     try:
-        df = pd.read_csv(DATABASE_PATH+csv_name)
+        df = pd.read_csv(DATASETS_ROOT+csv_name)
     except FileNotFoundError:
         return None, Server_error.print_error(Server_error.OPEN_DATABASE_ERROR)
     return df, Server_error.OK
@@ -49,10 +50,10 @@ def generate_energy_dataframe(time, id, received_payload, ck):
     return path.replace(' ', '_').replace('.csv') + '.csv'
 
 def serialize_to_string(content):
-    return convert_bytes_to_text(pickle.dumps(content))
+    return base64.b64encode(pickle.dumps(content)).decode('ascii')
 
 def deserialize_from_string(content):
-    return pickle.loads(convert_text_to_bytes(content))
+    return pickle.loads(base64.b64decode(content.encode('ascii')))
     
 def build_energy_sarima_model(time, id, received_payload, ck):
     error = Server_error.OK
