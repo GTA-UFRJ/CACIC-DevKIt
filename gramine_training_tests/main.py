@@ -1,14 +1,16 @@
+
+import base64
 import pandas as pd
 import pmdarima as pm 
 import numpy as np
 from sklearn.metrics import mean_squared_error
 import pickle
-import base64
 
-DATASETS_ROOT = './use_case/database/'
+DATASETS_ROOT = '/database/'
 
 def get_dataset(csv_name):
-    try:
+    print("Dataset path: " + DATASETS_ROOT+csv_name)
+    try:  
         df = pd.read_csv(DATASETS_ROOT+csv_name)
     except FileNotFoundError:
         print("Database not found")
@@ -68,7 +70,7 @@ def load_model():
 
 def build_energy_sarima_model(df,start_p=1,start_q=1,test='kpss',
                              max_p=3,max_q=3,m=24,d=None):
-    return pm.auto_arima(df['PJME_MW'], 
+    model = pm.auto_arima(df['PJME_MW'], 
         start_p=start_p, # ordem da auto regressão (AR)
         start_q=start_q, # ordem da média móvel (MA)
         test=test, # teste de estacionaridade de Kwiatkowski–Phillips–Schmidt–Shin 
@@ -80,6 +82,7 @@ def build_energy_sarima_model(df,start_p=1,start_q=1,test='kpss',
         error_action='warn', # mostra erros (alternativa: 'ignore')
         suppress_warnings=True,
         stepwise=True)
+    return model
         
 def predict_energy_sarima(model, points):
     result = {}
@@ -92,7 +95,7 @@ def predict_energy_sarima(model, points):
 def test_energy_sarima(predictions, test_values):
     return np.sqrt(mean_squared_error(test_values, pd.Series(predictions)))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     train, test, error = generate_daframes()
     if(error != 0):
         exit()
@@ -100,4 +103,3 @@ if __name__ == '__main__':
     store_model(model)
     result = predict_energy_sarima(model, test.shape[0])
     print("Test RMSE: %.3f" % test_energy_sarima(result['predicted_series'], test['PJME_MW']))
-    pass
