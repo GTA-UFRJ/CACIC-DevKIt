@@ -1,4 +1,3 @@
-
 import base64
 import pandas as pd
 import pmdarima as pm 
@@ -70,18 +69,21 @@ def load_model():
 
 def build_energy_sarima_model(df,start_p=1,start_q=1,test='kpss',
                              max_p=3,max_q=3,m=24,d=None):
-    model = pm.auto_arima(df['PJME_MW'], 
-        start_p=start_p, # ordem da auto regressão (AR)
-        start_q=start_q, # ordem da média móvel (MA)
-        test=test, # teste de estacionaridade de Kwiatkowski–Phillips–Schmidt–Shin 
-        max_p=max_p, max_q=max_q,
-        m=m, # frequencia de sazonalidade (m=1 => sazobalidade desligada)
-        d=d,# o modelo escolhe a ordem de derivação para alcançar estacionaridade (I)
-        seasonal=True, # liga sazonalidade (S)
-        trace=True, #logs 
-        error_action='warn', # mostra erros (alternativa: 'ignore')
-        suppress_warnings=True,
-        stepwise=True)
+    try:
+        model = pm.auto_arima(df['PJME_MW'], 
+            start_p=start_p, # ordem da auto regressão (AR)
+            start_q=start_q, # ordem da média móvel (MA)
+            test=test, # teste de estacionaridade de Kwiatkowski–Phillips–Schmidt–Shin 
+            max_p=max_p, max_q=max_q,
+            m=m, # frequencia de sazonalidade (m=1 => sazobalidade desligada)
+            d=d,# o modelo escolhe a ordem de derivação para alcançar estacionaridade (I)
+            seasonal=True, # liga sazonalidade (S)
+            trace=True, #logs 
+            error_action='warn', # mostra erros (alternativa: 'ignore')
+            suppress_warnings=True,
+            stepwise=True)
+    except:
+        return None 
     return model
         
 def predict_energy_sarima(model, points):
@@ -100,6 +102,9 @@ if __name__ == "__main__":
     if(error != 0):
         exit()
     model = build_energy_sarima_model(train) # or, use load model() to get a saved model
+    if model is None:
+        print("No model trained")
+        exit()
     store_model(model)
     result = predict_energy_sarima(model, test.shape[0])
     print("Test RMSE: %.3f" % test_energy_sarima(result['predicted_series'], test['PJME_MW']))
