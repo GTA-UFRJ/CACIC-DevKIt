@@ -112,7 +112,7 @@ sgx_status_t enclave_publication_wrapper(
     }
     decrypted[decrypted_size] = 0;
     if(debug) ocall_print_string((const char*)decrypted);
-    
+
 
     if(debug) ocall_print_string("\nVerify if IDs are equal");
 
@@ -211,6 +211,23 @@ sgx_status_t enclave_publication_wrapper(
         return ret;
     }
 
+    //if(debug) ocall_print_secret((uint8_t*)processed_data, *p_processed_data_size);
+
+
+/*
+    uint8_t re_decrypted [result_size+1];
+    ret = enclave_decrypt_data(&storage_key[0], (uint8_t*)processed_data, *p_processed_data_size, &re_decrypted[0]);
+
+    if(ret != SGX_SUCCESS) {
+        *p_error_code = (int)MESSAGE_DECRYPTION_ERROR;
+        return ret;
+    }
+    re_decrypted[result_size] = 0;
+    if(debug) ocall_print_string((const char*)re_decrypted);
+*/
+
+
+
     return SGX_SUCCESS;
 }
 
@@ -254,6 +271,8 @@ sgx_status_t enclave_retrieve_data(
     }
     if(debug) ocall_print_secret(&storage_key[0], 16);
 
+    // UNSEAL MOST RECENT VERSION 
+
     if(debug) ocall_print_string("\nDecrypt encrypted pk field of query message");
 
     uint32_t decrypted_pk_size = 8;
@@ -274,6 +293,7 @@ sgx_status_t enclave_retrieve_data(
     }
 
     if(debug) ocall_print_string("\nDecrypt encrypted stored data");
+    //ocall_print_secret(encrypted_data,encrypted_data_size);
 
     // Decrypt encrypted stored data
     uint32_t decrypted_size = encrypted_data_size - 12 - 16;
@@ -299,6 +319,8 @@ sgx_status_t enclave_retrieve_data(
         *p_error_code = (int)ACCESS_DENIED;
         return ret;
     }
+
+    // VERIFY IF FW MATCHES THE REQUESTED AND IF VN IS THE MOST RECENT ONE
 
     if(debug) ocall_print_string("\nEncrypt data with querier key");
 

@@ -28,9 +28,10 @@ void print_usage() {
     printf("./Client publish 123456 250 default\n\n");
     printf("Example for publishing a data of type 555555, payload \"SELECT * from TACIOT where type='123456'\" and permission for 72d41281\n");
     printf("./Client publish 555555 \"SELECT * from TACIOT where type='123456'\" 72d41281\n\n");
+    */
     printf("Example for querying a data using SQL command \"SELECT * from TACIOT where type='123456'\" of index 0\n");
     printf("./Client query 0 \"SELECT * from TACIOT where type='123456'\"\n\n");
-    printf("Example for reading default access permissions for type='123456'\n");
+    /*printf("Example for reading default access permissions for type='123456'\n");
     printf("./Client read_perm 123456\n\n");
     printf("Example for writing default access permissions for type='123456'\n");
     printf("./Client write_perm 123456 72d41281\n\n");

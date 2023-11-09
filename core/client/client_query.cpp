@@ -77,7 +77,7 @@ int send_query_message(uint32_t data_index,
         command[i] = (command[i] == ' ') ? '_' : command[i];
 
     // Build query message
-    // http://localhost:7778/query/size=24/pk|72d41281|index|000000
+    // http://localhost:7778/query/size=24/pk|72d41281|index|000000|...
     char* http_request = (char*)malloc(URL_MAX_SIZE);
     memset(http_request, 0, URL_MAX_SIZE);
     uint32_t message_size = 53+(uint32_t)strlen(command)+(8+16+12)*3;

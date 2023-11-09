@@ -154,6 +154,8 @@ server_error_t get_response(stored_data_t stored,
     }
     //printf("%s\n", querier_pk);
 
+    // READ MOST RECENT VERSION FILE
+
     // Call enclave to unseal keys, decrypt with the querier key and encrypt with querier key
     {
     if(DEBUG_TIMER) Timer t2("retrieve_data");

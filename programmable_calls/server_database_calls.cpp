@@ -75,7 +75,8 @@ server_error_t query_db(char* command, uint32_t index, char* data, uint32_t* )
     }
 
     memcpy(data, datas[index], datas_sizes[index]);
-    printf("%s\n", data);
+    printf("DATA FROM DB: %s\n", data);
+    //debug_print_encrypted(130,(uint8_t*)data+90);
     free(datas);
     free(datas_sizes);
 

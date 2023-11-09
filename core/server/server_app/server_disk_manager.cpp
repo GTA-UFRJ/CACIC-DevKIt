@@ -19,10 +19,10 @@ server_error_t get_stored_parameters(char* msg, stored_data_t* p_stored)
 
     if(DEBUG_PRINT) printf("\nParsing stored data fields\n");
 
-    // time|2012-05-06.21:47:59|type|123456|pk|72d41281|size|0x54|encrypted|0x62-...
+    // time|2012-05-06.21:47:59|type|123456|pk|72d41281|fw|654321|vn|789101|size|0x54|encrypted|0x62-...
     char* token = strtok_r(msg, "|", &msg);
     int i = 0;
-    while (token != NULL && i<8)
+    while (token != NULL && i<12)
     {
         i++;
         token = strtok_r(NULL, "|", &msg);
@@ -43,7 +43,7 @@ server_error_t get_stored_parameters(char* msg, stored_data_t* p_stored)
             if(DEBUG_PRINT) printf("type: %s\n", p_stored->type);
         }
 
-        // Get client key       
+        // Get client pk (id)       
         if (i == 5) {
             memcpy(p_stored->pk, token, 8);
             p_stored->pk[8] = '\0';
@@ -51,8 +51,24 @@ server_error_t get_stored_parameters(char* msg, stored_data_t* p_stored)
             if(DEBUG_PRINT) printf("pk: %s\n", p_stored->pk);
         }
 
-        // Get encrypted message size
+        // Get fw code       
         if (i == 7) {
+            memcpy(p_stored->fw, token, 6);
+            p_stored->fw[6] = '\0';
+
+            if(DEBUG_PRINT) printf("fw: %s\n", p_stored->fw);
+        }
+
+        // Get vn   
+        if (i == 9) {
+            memcpy(p_stored->vn, token, 6);
+            p_stored->vn[6] = '\0';
+
+            if(DEBUG_PRINT) printf("vn: %s\n", p_stored->vn);
+        }
+
+        // Get encrypted message size
+        if (i == 11) {
             p_stored->encrypted_size = (uint32_t)strtoul(token,NULL,16);
             if(DEBUG_PRINT) printf("encrypted_size: %u\n", p_stored->encrypted_size);
         }
@@ -63,7 +79,7 @@ server_error_t get_stored_parameters(char* msg, stored_data_t* p_stored)
     
     memcpy(p_stored->encrypted, msg, p_stored->encrypted_size);
     p_stored->encrypted[p_stored->encrypted_size] = 0;
-    //debug_print_encrypted((size_t)(stored.encrypted_size), stored.encrypted);
+    //debug_print_encrypted((size_t)(p_stored->encrypted_size), p_stored->encrypted);
 
     return OK;
 }
