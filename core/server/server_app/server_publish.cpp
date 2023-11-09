@@ -84,8 +84,7 @@ void ocall_multi_query_db(
 
 
 
-
-// time|12h30m57s|pk|72d41281|type|123456|size|62|encrypted|...
+// time|2012-05-06.21:47:59|pk|72d41281|type|123456|fw|654321|vn|789101|size|62|encrypted|... 
 server_error_t parse_request(char* msg, iot_message_t* p_rcv_msg)
 {
     int ret = 0;
@@ -126,8 +125,24 @@ server_error_t parse_request(char* msg, iot_message_t* p_rcv_msg)
             if(DEBUG_PRINT) printf("type: %s\n", p_rcv_msg->type);
         }
 
-        // Get encrypted message size
+        // Get firmware code
         if (i == 7) {
+            memcpy(p_rcv_msg->fw, token, 6);
+            p_rcv_msg->fw[6] = '\0';
+
+            if(DEBUG_PRINT) printf("fw: %s\n", p_rcv_msg->fw);
+        }
+
+        // Get version number
+        if (i == 9) {
+            memcpy(p_rcv_msg->vn, token, 6);
+            p_rcv_msg->vn[6] = '\0';
+
+            if(DEBUG_PRINT) printf("vn: %s\n", p_rcv_msg->vn);
+        }
+
+        // Get encrypted message size
+        if (i == 11) {
             p_rcv_msg->encrypted_size = (uint32_t)strtoul(token, &invalid_char, 16);
 
             if(*invalid_char != 0)
@@ -137,7 +152,7 @@ server_error_t parse_request(char* msg, iot_message_t* p_rcv_msg)
         }
 
         // Get encrypted message
-        if (i == 9) {
+        if (i == 13) {
             p_rcv_msg->encrypted = (uint8_t*)malloc((p_rcv_msg->encrypted_size+1) * sizeof(uint8_t));
 
             ret = convert_text_to_buffer(token, 3*(p_rcv_msg->encrypted_size), p_rcv_msg->encrypted, NULL);
@@ -198,10 +213,10 @@ server_error_t server_publish(const Request& req, Response& res, sgx_enclave_id_
     }
  
     // Server receives and separate parameters according to Ultrlight protocol
-    // time|2012-05-06.21:47:59|pk|72d41281|type|123456|size|62|encrypted|... 
+    // time|2012-05-06.21:47:59|pk|72d41281|type|123456|fw|654321|vn|789101|size|62|encrypted|... 
     iot_message_t rcv_msg;
     ret = parse_request(snd_msg, &rcv_msg);
-    free(snd_msg);
+    free(snd_msg); 
     if(ret)
         return ret;
 
@@ -220,8 +235,8 @@ server_error_t server_publish(const Request& req, Response& res, sgx_enclave_id_
         return ret;
     }
 
-    uint32_t processed_data_size;
-    char* processed_data = (char*)malloc(processed_data_size);
+    uint32_t returned_encrypted_data_size;
+    char* returned_encrypted_data = (char*)malloc(returned_encrypted_data_size);
 
     sgx_status_t sgx_ret;
     sgx_status_t ecall_status;
@@ -233,10 +248,12 @@ server_error_t server_publish(const Request& req, Response& res, sgx_enclave_id_
         rcv_msg.time,
         rcv_msg.pk,
         rcv_msg.type,
+        rcv_msg.fw,
+        rcv_msg.vn,
         rcv_msg.encrypted,
         rcv_msg.encrypted_size,
-        processed_data,
-        &processed_data_size,
+        returned_encrypted_data,
+        &returned_encrypted_data_size,
         &enc_ret);
     if(DEBUG_PRINT) printf("\n------------ EXITED ENCLAVE -----------\n");
     
@@ -248,14 +265,20 @@ server_error_t server_publish(const Request& req, Response& res, sgx_enclave_id_
     free(rcv_msg.encrypted);
 
     if(sgx_ret != SGX_SUCCESS || ecall_status != SGX_SUCCESS || ret != OK) {
-        free(processed_data);
+        free(returned_encrypted_data);
         printf("\nSGX return error code: 0x%04x\nEcall status error code: 0x%04x\n", (int)sgx_ret, (int)ecall_status);
         if(ret != OK) return print_error_message(ret);
         else return print_error_message(PUBLICATION_ENCLAVE_ERROR);
     }
     
-    if((ret = publish_db(rcv_msg.time, rcv_msg.pk, rcv_msg.type, processed_data, processed_data_size))){
-        free(processed_data);
+    if((ret = publish_db(rcv_msg.time, 
+                         rcv_msg.pk, 
+                         rcv_msg.type, 
+                         rcv_msg.fw, 
+                         rcv_msg.vn, 
+                         returned_encrypted_data, 
+                         returned_encrypted_data_size))){
+        free(returned_encrypted_data);
         return print_error_message(ret); 
     }
 

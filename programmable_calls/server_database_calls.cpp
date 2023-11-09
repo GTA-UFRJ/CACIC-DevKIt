@@ -13,12 +13,20 @@
 
 // Program functions for database interface in this file
 
-server_error_t publish_db(char* time, char* pk, char* type, char* data, uint32_t data_size) 
+server_error_t publish_db(char* time, 
+                          char* pk, 
+                          char* type, 
+                          char* fw,
+                          char* vn,
+                          char* data, 
+                          uint32_t data_size) 
 {
     iot_message_t data_for_writing;
     memcpy(data_for_writing.time, time, 20);
     memcpy(data_for_writing.pk, pk, 9);
     memcpy(data_for_writing.type, type, 7);
+    memcpy(data_for_writing.fw, fw, 7);
+    memcpy(data_for_writing.vn, vn, 7);
     data_for_writing.encrypted_size = data_size; // does not includes /n
     data_for_writing.encrypted = (uint8_t*)malloc(data_size);
     memcpy(data_for_writing.encrypted, data, data_size);

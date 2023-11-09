@@ -18,19 +18,6 @@ int query_interface(int argc, char** argv);
 int read_perm_interface(int argc, char** argv );
 int write_perm_interface(int argc, char** argv );
 int register_interface(int argc, char** argv );
-int register_ap_interface(int argc, char** argv );
-int read_ap_perm_interface(int argc, char** argv ); 
-int write_ap_perm_interface(int argc, char** argv ); 
-int ap_init_interface(int argc, char** argv );
 
-// Overloaded alternatives
-int publish_interface(std::string type, std::string sql_statement, std::string perms, bool default_perms);
-int query_interface(uint32_t, std::string, std::string*);
-int read_perm_interface(std::string, std::string *);
-int write_perm_interface(std::string, std::string);
-int register_interface(std::string, std::string);
-int register_ap_interface(std::string, std::string);
-int read_ap_perm_interface(std::string, std::string* );
-int write_ap_perm_interface(std::string, std::string);
 //ap_init
 #endif

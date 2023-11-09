@@ -102,9 +102,9 @@ server_error_t database_write(sqlite3* db, iot_message_t rcv_msg)
     // Create SQL statement for inserting data into the database
     char* insert_sql_statement = (char*)malloc((MAX_DATA_SIZE+150)*sizeof(char));
     sprintf(insert_sql_statement, 
-    "INSERT INTO TACIOT (ID,TIME,TYPE,PK,SIZE,ENCRYPTED) "\
-    "VALUES ('%s','%s','%s','%s',%u,'%s');",
-    index, rcv_msg.time, rcv_msg.type, rcv_msg.pk, rcv_msg.encrypted_size, enc_write);
+    "INSERT INTO TACIOT (ID,TIME,TYPE,PK,FW,VN,SIZE,ENCRYPTED) "\
+    "VALUES ('%s','%s','%s','%s','%s','%s',%u,'%s');",
+    index, rcv_msg.time, rcv_msg.type, rcv_msg.pk, rcv_msg.fw, rcv_msg.vn, rcv_msg.encrypted_size, enc_write);
     
     if(DEBUG_PRINT) printf("SQL insert statement: %s\n", insert_sql_statement); 
 

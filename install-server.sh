@@ -17,7 +17,7 @@ python3 setup_macros_file.py "(HTTPLIB)" "$CPP_HTTPLIB_PATH"
 python3 setup_macros_file.py "(SERVERURL)" "$SERVER_URL"
 python3 setup_macros_file.py "(SERVERPORT)" "$SERVER_PORT"
 
-make -f build.make \
+make \
 server_enclave.signed.so \
 Server \
 HTTPLIB_DIR=$CPP_HTTPLIB_PATH 

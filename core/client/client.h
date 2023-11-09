@@ -15,6 +15,8 @@ typedef struct client_data {
     char time[20];
     char pk[9];
     char type[7];
+    char fw[7];
+    char vn[7];
     char* payload;
     uint32_t permissions_count;
     char** permissions_list;

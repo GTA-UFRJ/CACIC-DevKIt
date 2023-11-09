@@ -90,7 +90,7 @@ server_error_t enclave_get_payload(
     uint32_t* payload_size) 
 {
     // Verify if payload exists and is valid
-    // time|2012-05-06.21:47:59|pk|72d41281|type|123456|payload|250|permission1|72d41281
+    // time|2012-05-06.21:47:59|pk|72d41281|type|123456|fw|654321|vn|789101|payload|...|permission1|72d41281
     char* text = (char*)malloc(1+decrypted_size);
     memcpy(text, decrypted, decrypted_size);
     text[decrypted_size] = '\0';
@@ -103,7 +103,7 @@ server_error_t enclave_get_payload(
         i++;
         token = strtok_r(NULL, "|", &auxiliar_text);
  
-        if (i == 7) {
+        if (i == 11) {
             if(strlen(token) > *payload_size) {
                 free(text);
                 return INVALID_PAYLOAD_ERROR;
@@ -124,7 +124,7 @@ server_error_t enclave_verify_permissions(
     bool* accepted) 
 {
     // Get permissions and verify if querier is included
-    // time|2012-05-06.21:47:59|pk|72d41281|type|123456|payload|250|permission1|72d41281
+    // time|2012-05-06.21:47:59|pk|72d41281|type|123456|fw|654321|vn|789101|payload|...|permission1|72d41281
     char text [1+(size_t)decrypted_len];
     memcpy(text, decrypted, decrypted_len);
     text[decrypted_len] = '\0';
@@ -139,7 +139,7 @@ server_error_t enclave_verify_permissions(
         i++;
         token = strtok_r(NULL, "|", &consumed_text);
  
-        if (i == 9+2*permission_count) {
+        if (i == 11+2*permission_count) {
             if(!memcmp(token, pk, 8))
                 *accepted = true;
             permission_count++;
@@ -199,11 +199,12 @@ server_error_t enclave_get_permissions(
     char access_permissions [1+plain_data_size];
     memcpy(access_permissions, plain_data, plain_data_size);
     access_permissions[plain_data_size] = 0;
-    
+
+    // time|2012-05-06.21:47:59|pk|72d41281|type|123456|fw|654321|vn|789101|payload|...|permission1|72d41281
     int i = 0;
     char* p_access_permissions = &access_permissions[0];
     char* token = strtok_r(p_access_permissions, "|", &p_access_permissions);
-    while (token != NULL && i<7)
+    while (token != NULL && i<11)
     {
         token = strtok_r(NULL, "|", &p_access_permissions);
         i++;
@@ -348,6 +349,8 @@ server_error_t enclave_build_result(
     char* time,
     char* pk,
     char* type,
+    char* fw,
+    char* vn,
     uint8_t* payload,
     uint32_t payload_size,
     char* permissions,
@@ -355,20 +358,22 @@ server_error_t enclave_build_result(
     uint8_t* result,
     uint32_t* p_resullt_size) 
 {
-    if(57+permissions_size+1 > *p_resullt_size) 
+    if(77+permissions_size+1 > *p_resullt_size) 
         return RESULT_BUFFER_OVERFLOW_ERROR;
 
-    char str[] = "time|xxxxxxxxxxxxxxxxxxx|pk|xxxxxxxx|type|xxxxxx|payload|";
+    char str[] = "time|xxxxxxxxxxxxxxxxxxx|pk|xxxxxxxx|type|xxxxxx|fw|xxxxxx|vn|xxxxxx|payload|";
     memcpy(&str[5], time, 19);
     memcpy(&str[28], pk, 8);
     memcpy(&str[42], type, 6);
+    memcpy(&str[52], fw, 6);
+    memcpy(&str[62], type, 6);
     
     memset(result, 0, *p_resullt_size);
-    memcpy(result, &str[0], 57);
+    memcpy(result, &str[0], 77);
 
-    memcpy(result+57, payload, payload_size);
-    *(result + 57 + payload_size) = '|';
-    memcpy(result + 57 + payload_size + 1, permissions, permissions_size);
+    memcpy(result+77, payload, payload_size);
+    *(result + 77 + payload_size) = '|';
+    memcpy(result + 77 + payload_size + 1, permissions, permissions_size);
     *p_resullt_size = (uint32_t)strlen((char*)result);
 
     return OK;

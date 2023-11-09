@@ -60,6 +60,8 @@ sgx_status_t enclave_publication_wrapper(
     char* time,
     char* pk,
     char* type,
+    char* fw,
+    char* vn,
     uint8_t* encrypted,
     uint32_t encrypted_size,
     char* processed_data,
@@ -121,7 +123,7 @@ sgx_status_t enclave_publication_wrapper(
 
     if(debug) ocall_print_string("\nGet payload field inside decrypted");
 
-    uint32_t payload_size = 128;
+    uint32_t payload_size = 1024;
     char payload[payload_size];
     *p_error_code = enclave_get_payload(&decrypted[0], decrypted_size, &payload[0], &payload_size);
 
@@ -146,6 +148,8 @@ sgx_status_t enclave_publication_wrapper(
         *p_error_code = task
             (time, 
              pk, 
+             fw,
+             vn,
              payload, 
              payload_size, 
              publisher_key, 
@@ -184,6 +188,8 @@ sgx_status_t enclave_publication_wrapper(
         (time, 
          pk, 
          type, 
+         fw,
+         vn,
          &result_payload[0], 
          result_payload_size, 
          permissions,

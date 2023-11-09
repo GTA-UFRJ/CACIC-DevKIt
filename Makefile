@@ -172,8 +172,6 @@ Client_Cpp_Files := core/client/client_publish.cpp \
 Client_Cpp_Files += use_case/client/cli.cpp \
 					use_case/client/client_permdb_manager.cpp \
 					use_case/client/client_key_manager.cpp \
-					use_case/client/client_apnet.cpp \
-					use_case/client/client_uenet.cpp \
 					use_case/client/client_generic_interface.cpp
 
 Client_Include_Paths := -I. \

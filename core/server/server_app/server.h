@@ -23,6 +23,8 @@ typedef struct iot_message_t
     char time[20];
     char pk[9];
     char type[7];
+    char fw[7];
+    char vn[7];
     uint32_t encrypted_size;
     uint8_t* encrypted;
 } iot_message_t;

@@ -110,6 +110,8 @@ server_error_t enclave_build_result(
     char* time,
     char* pk,
     char* type,
+    char* fw,
+    char* vn,
     uint8_t* payload,
     uint32_t payload_size,
     char* permissions,

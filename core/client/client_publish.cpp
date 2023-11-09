@@ -22,16 +22,23 @@
 #include "encryption.h"
 #include "utils.h"
 
-int send_data_for_publication(char* time, char* pk, char* type, uint8_t* enc_data, uint32_t enc_data_size)
+int send_data_for_publication(char* time, 
+                              char* pk, 
+                              char* type, 
+                              char* fw, 
+                              char* vn, 
+                              uint8_t* enc_data, 
+                              uint32_t enc_data_size)
 {
     // Build publication message
-    // "http://localhost:7778/publish/size=631/time|10h20m33s|pk|72d41281|type|555555|size|62|encrypted|dd-b1-b6-b8-22-d3-9a-..."
-    size_t header_size = 5+20+3+9+5+7+5+3+10;
+    // "http://localhost:7778/publish/size=631/time|10h20m33s|pk|72d41281|type|555555|fw|654321|vn|789101|size|62|encrypted|dd-b1-b6-b8-22-d3-9a-..."
+    size_t header_size = 5+20+3+9+5+7+3+7+3+7+5+4+10;
     size_t snd_msg_size = (header_size+1+3*enc_data_size)*sizeof(char);
 
     char* snd_msg = (char*)malloc(snd_msg_size);
     memset(snd_msg, 0, snd_msg_size);
-    sprintf(snd_msg, "time|%s|pk|%s|type|%s|size|%02x|encrypted|", time, pk, type, (unsigned int)enc_data_size);
+    sprintf(snd_msg, "time|%s|pk|%s|type|%s|fw|%s|vn|%s|size|%03x|encrypted|", 
+            time, pk, type, fw, vn, (unsigned int)enc_data_size);
 
     convert_buffer_to_text(enc_data, enc_data_size, &snd_msg[header_size], NULL);
 
@@ -83,16 +90,17 @@ int send_data_for_publication(char* time, char* pk, char* type, uint8_t* enc_dat
     return 0;
 }
 
-int client_publish(uint8_t* key, client_data_t data)
+int client_publish(uint8_t* key, client_data_t data) 
 {
     // Mount text with client data
-    // time|10h30m47s|pk|72d41281|type|123456|payload|250|permission1|72d41281
-    uint32_t formatted_data_size = 5+20+3+9+5+7+8+(uint32_t)strlen(data.payload)+(13+8)*(data.permissions_count);
+    // time|2012-05-06.21:47:59|pk|72d41281|type|123456|fw|654321|vn|789101|payload|...|permission1|72d41281
+    uint32_t formatted_data_size = 5+20+3+9+5+7+3+7+3+7+8+(uint32_t)strlen(data.payload)+(13+8)*(data.permissions_count);
     char* formatted_data = (char*)malloc(sizeof(char) * (formatted_data_size+1)); // includes \n
     memset(formatted_data, 0, formatted_data_size+1);
 
-    sprintf(formatted_data,"time|%s|pk|%s|type|%s|payload|%s", 
-            data.time, data.pk, data.type, data.payload);
+    sprintf(formatted_data,"time|%s|pk|%s|type|%s|fw|%s|vn|%s|payload|%s", 
+            data.time, data.pk, data.type, data.fw, data.vn, data.payload);
+
 
     char* permission = (char*)malloc(13+8+1);
     for(uint32_t index=0; index<data.permissions_count; index++) {
@@ -106,6 +114,9 @@ int client_publish(uint8_t* key, client_data_t data)
     uint8_t* enc_data = (uint8_t *) malloc(enc_data_size*sizeof(uint8_t));
 
     int ret = encrypt_data(key, enc_data, &enc_data_size, (uint8_t*)formatted_data, formatted_data_size); // does not includes \n
+    
+    //debug_print_encrypted(enc_data_size,enc_data);
+    
     free(formatted_data);
     if(ret != 0) {
         free(enc_data);
@@ -113,7 +124,14 @@ int client_publish(uint8_t* key, client_data_t data)
     }
 
     // Send data for publication
-    int send_ret = send_data_for_publication(data.time, data.pk, data.type, enc_data, enc_data_size);
+    int send_ret = send_data_for_publication(
+        data.time, 
+        data.pk, 
+        data.type, 
+        data.fw,
+        data.vn,
+        enc_data, 
+        enc_data_size);
     free(enc_data);
     
     return send_ret;

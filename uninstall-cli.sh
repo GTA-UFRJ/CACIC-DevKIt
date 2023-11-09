@@ -7,7 +7,7 @@ else
     echo "Backup directory alredy exists"
 fi
 
-make -f build.make clean_client
+make clean_client
 rm config_macros.h
 mv ./use_case/database/default_permissions.db "./backup/default_permissions-$(date '+%F-%H-%M-%S').db"
 rm ./use_case/client/client_permdb_config

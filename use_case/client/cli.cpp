@@ -12,8 +12,6 @@
 #include "client_key_manager.h"
 #include "client_publish.h"
 #include "client_query.h"
-#include "client_apnet.h"
-#include "client_uenet.h"
 #include "client_register.h"
 #include "client_generic_interface.h"
 #include "config_macros.h" 
@@ -43,26 +41,6 @@ int main (int argc, char *argv[]) {
 
     else if (!strcmp(argv[1],"register")) 
         return register_interface(argc, argv);
-
-    else if (!strcmp(argv[1],"register_ap")) 
-        return register_ap_interface(argc, argv);
-
-    else if (!strcmp(argv[1],"read_ap_perm"))
-        return read_ap_perm_interface(argc, argv);
-
-    else if (!strcmp(argv[1],"write_ap_perm"))
-        return write_ap_perm_interface(argc, argv);
-
-    else if (!strcmp(argv[1],"ap_init"))
-    {
-        if(argc != 2) {
-            printf("Invalid number of arguments arguments\n");
-            print_usage();
-            return -1;
-        }
-
-        return initialize_ap_server();
-    }
     
     else {
         printf("Invalid message\n");

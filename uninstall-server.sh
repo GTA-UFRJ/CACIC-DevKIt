@@ -7,7 +7,7 @@ else
     echo "Backup directory alredy exists"
 fi
 
-make -f build.make clean_server
+make clean_server
 rm config_macros.h
 mv ./use_case/database/taciot.db "./backup/taciot-$(date '+%F-%H-%M-%S').db"
 rm ./use_case/server/server_database_config

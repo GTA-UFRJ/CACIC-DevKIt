@@ -24,7 +24,14 @@
     Return:
     Enumerated type defined in errors.h 
 */
-server_error_t publish_db(char* time, char* pk, char* type, char* data, uint32_t data_size);
+server_error_t publish_db(
+    char* time, 
+    char* pk, 
+    char* type, 
+    char* fw,
+    char* vn,
+    char* data, 
+    uint32_t data_size);
 
 /*
     Program this interface for queriying data in the database

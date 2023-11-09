@@ -62,6 +62,8 @@ int configure_database(char* name){
       "TIME         CHAR(20)                NOT NULL,"  \
       "TYPE         CHAR(6)                 NOT NULL,"  \
       "PK           CHAR(8)                 NOT NULL,"  \
+      "FW           CHAR(6)                 NOT NULL,"  \
+      "VN           CHAR(6)                 NOT NULL,"  \
       "SIZE         INT                     NOT NULL,"  \
       "ENCRYPTED    TEXT                    NOT NULL    );";
     const char *create_table_sql_statement = create_table_sql_statement_string.c_str();

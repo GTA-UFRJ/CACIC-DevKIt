@@ -17,6 +17,6 @@ python3 setup_macros_file.py "(APPORT)" "$AP_PORT"
 python3 setup_macros_file.py "(SERVERURL)" "$SERVER_URL"
 python3 setup_macros_file.py "(SERVERPORT)" "$SERVER_PORT"
 
-make -f build.make \
+make \
 Client \ 
 HTTPLIB_DIR=$CPP_HTTPLIB_PATH 
