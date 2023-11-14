@@ -102,15 +102,15 @@ sgx_status_t enclave_publication_wrapper(
 
     if(debug) ocall_print_string("\nDecrypt encrypted field of publication message");
 
-    uint32_t decrypted_size = encrypted_size - 16 - 12;
+    uint32_t decrypted_size = encrypted_size - 32 - 16;
     uint8_t decrypted [decrypted_size+1];
+    decrypted[decrypted_size] = 0;
     ret = enclave_decrypt_data(&publisher_key[0], encrypted, encrypted_size, &decrypted[0]);
 
     if(ret != SGX_SUCCESS) {
         *p_error_code = (int)MESSAGE_DECRYPTION_ERROR;
         return ret;
     }
-    decrypted[decrypted_size] = 0;
     if(debug) ocall_print_string((const char*)decrypted);
 
 
@@ -203,7 +203,7 @@ sgx_status_t enclave_publication_wrapper(
 
     if(debug) ocall_print_string("\nEcnrypt result");
 
-    *p_processed_data_size = result_size + 16 + 12; // does not inclues /n
+    *p_processed_data_size = result_size + 32 + 16; // does not inclues /n
     ret = enclave_encrypt_data(storage_key, (uint8_t*)processed_data, &result[0], result_size);
 
     if(ret != SGX_SUCCESS) {
@@ -278,7 +278,7 @@ sgx_status_t enclave_retrieve_data(
     uint32_t decrypted_pk_size = 8;
     uint8_t decrypted_pk [decrypted_pk_size];
     memset(decrypted_pk, 0, decrypted_pk_size);
-    ret = enclave_decrypt_data(&querier_key[0], encrypted_pk, 8+16+12, &decrypted_pk[0]);
+    ret = enclave_decrypt_data(&querier_key[0], encrypted_pk, decrypted_pk_size+32+16, &decrypted_pk[0]);
 
     if(ret != SGX_SUCCESS) {
         *p_error_code = (int)MESSAGE_DECRYPTION_ERROR;
@@ -296,7 +296,7 @@ sgx_status_t enclave_retrieve_data(
     //ocall_print_secret(encrypted_data,encrypted_data_size);
 
     // Decrypt encrypted stored data
-    uint32_t decrypted_size = encrypted_data_size - 12 - 16;
+    uint32_t decrypted_size = encrypted_data_size - 32 - 16;
     uint8_t decrypted [decrypted_size+1];
     ret = enclave_decrypt_data(&storage_key[0], encrypted_data, encrypted_data_size, &decrypted[0]);
 

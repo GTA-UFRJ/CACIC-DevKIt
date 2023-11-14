@@ -89,8 +89,8 @@ server_error_t parse_query(char* msg, access_message_t* p_rcv_msg)
         
         // Get encrypted 
         if (i == 9) {
-            ret = convert_text_to_buffer(token, 3*(8+16+12), p_rcv_msg->encrypted, NULL);
-            p_rcv_msg->encrypted[8+12+16] = '\0';
+            ret = convert_text_to_buffer(token, 3*(8+32+16), p_rcv_msg->encrypted, NULL);
+            p_rcv_msg->encrypted[8+32+16] = '\0';
         }
     }
 

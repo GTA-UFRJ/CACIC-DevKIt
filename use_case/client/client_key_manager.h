@@ -13,10 +13,6 @@
 #include HTTPLIB_PATH
 #include "client.h"
 
-int parse_configure_key_message(char*, client_identity_t* );
-
-int get_configure_key_message(const httplib::Request& , char* , uint32_t* );
-
 int read_identity(client_identity_t* );
 
 int write_identity(client_identity_t );

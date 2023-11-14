@@ -21,6 +21,7 @@ int send_query_message(uint32_t data_index,
                        char* command, 
                        uint32_t command_size,
                        uint8_t* enc_pk,
+                       uint32_t enc_pk_size,
                        char* id);
 
 /*

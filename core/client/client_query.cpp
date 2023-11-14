@@ -68,6 +68,7 @@ int send_query_message(uint32_t data_index,
                        char* command, 
                        uint32_t command_size,
                        uint8_t* enc_pk,
+                       uint32_t enc_pk_size,
                        char* id)
 {
     int ret = 0;
@@ -80,11 +81,11 @@ int send_query_message(uint32_t data_index,
     // http://localhost:7778/query/size=24/pk|72d41281|index|000000|...
     char* http_request = (char*)malloc(URL_MAX_SIZE);
     memset(http_request, 0, URL_MAX_SIZE);
-    uint32_t message_size = 53+(uint32_t)strlen(command)+(8+16+12)*3;
+    uint32_t message_size = 53+(uint32_t)strlen(command)+enc_pk_size*3;
     sprintf(http_request, "/query/size=%u/pk|%s|index|%06u|size|%02x|command|%s|encrypted|", 
     message_size, id, data_index, command_size, command);
 
-    convert_buffer_to_text(enc_pk, 8+12+16, http_request+strlen(http_request), NULL);
+    convert_buffer_to_text(enc_pk, enc_pk_size, http_request+strlen(http_request), NULL);
     
     // Send query message
     httplib::Error err = httplib::Error::Success;
@@ -132,7 +133,7 @@ int send_query_message(uint32_t data_index,
 int client_query(uint8_t* key, uint8_t* data, uint32_t data_index, char* command, uint32_t* data_size, char* id)
 { 
     // Encrypt pk
-    uint32_t enc_pk_size = 8+12+16;
+    uint32_t enc_pk_size = MAX_ENC_DATA_SIZE;
     uint8_t* enc_pk = (uint8_t*)malloc(enc_pk_size);
     memset(enc_pk,0,enc_pk_size);
     int ret = encrypt_data(key, enc_pk, &enc_pk_size, (uint8_t*)id, 8);
@@ -146,7 +147,7 @@ int client_query(uint8_t* key, uint8_t* data, uint32_t data_index, char* command
     uint32_t enc_message_size = MAX_ENC_DATA_SIZE;
     uint8_t* enc_message = (uint8_t*)malloc(MAX_ENC_DATA_SIZE*sizeof(uint8_t));
     
-    int query_ret = send_query_message(data_index, enc_message, &enc_message_size, command, (uint32_t)strlen(command), enc_pk, id);
+    int query_ret = send_query_message(data_index, enc_message, &enc_message_size, command, (uint32_t)strlen(command), enc_pk, enc_pk_size, id);
     free(enc_pk);
     if(query_ret) {
         free(enc_message);

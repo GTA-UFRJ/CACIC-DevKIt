@@ -21,30 +21,44 @@ sgx_status_t enclave_encrypt_data(
     uint8_t* plain_data,
     uint32_t plain_data_size)
 {
-    sgx_aes_gcm_128bit_key_t aes_key;
+    sgx_aes_ctr_128bit_key_t aes_key;
     memcpy(aes_key, key, 16);
 
-    uint8_t aes_gcm_iv[12] = {0};
-    memcpy(enc_data+16, aes_gcm_iv, 12);
+    uint8_t aes_ctr_iv[16] = {0};
+    memcpy(enc_data+32, aes_ctr_iv, 16);
 
+    sgx_status_t ret = SGX_SUCCESS;
+    
     /* 
     * Encrypted data:      | MAC | IV | AES128(data)
-    * Buffer size:           16    12   size(data)
+    * Buffer size:           32    16   size(data)
     *
-    * MAC reference:         &data       :   &data+16
-    * IV reference:          &data+16    :   &data+16+12
-    * AES128(data) ref:      &data+12+16 : 
+    * MAC reference:         &data       :   &data+32
+    * IV reference:          &data+32    :   &data+32+16
+    * AES128(data) ref:      &data+32+16 : 
     */
-    sgx_status_t ret = sgx_rijndael128GCM_encrypt
+    ret = sgx_aes_ctr_encrypt
         (&aes_key,
         plain_data,
         plain_data_size,
-        enc_data + 16 + 12,
-        &aes_gcm_iv[0],
-        12,
-        NULL,
-        0,
-        (sgx_aes_gcm_128bit_tag_t*)enc_data);
+        &aes_ctr_iv[0],
+        128,
+        enc_data+32+16);
+
+    if(ret != SGX_SUCCESS)
+        return ret;
+
+    uint8_t data_to_be_hashed[plain_data_size+16];
+    memcpy(data_to_be_hashed, plain_data, plain_data_size);
+    memcpy(data_to_be_hashed+plain_data_size, enc_data+32, 16);
+
+    sgx_sha256_hash_t mac = {0};
+    ret = sgx_sha256_msg
+        (data_to_be_hashed,
+        plain_data_size+16,
+        &mac);
+
+    memcpy(enc_data,mac,32);
 
     return ret;
 }
@@ -56,29 +70,58 @@ sgx_status_t enclave_decrypt_data(
     uint32_t enc_data_size,
     uint8_t* plain_data)
 {
-    sgx_aes_gcm_128bit_key_t aes_key;
+    sgx_aes_ctr_128bit_key_t aes_key;
     memcpy(aes_key, key, 16);
 
-    memset(plain_data, 0, enc_data_size-12-16);
+    uint32_t plain_data_size = enc_data_size-32-16;
+    memset(plain_data, 0, plain_data_size);
+
+    sgx_status_t ret = SGX_SUCCESS;
 
     /* 
     * Encrypted data:      | MAC | IV | AES128(data)
-    * Buffer size:           16    12   size(data)
+    * Buffer size:           32    16   size(data)
     *
-    * MAC reference:         &data       :   &data+16
-    * IV reference:          &data+16    :   &data+16+12
-    * AES128(data) ref:      &data+12+16 : 
+    * MAC reference:         &data       :   &data+32
+    * IV reference:          &data+32    :   &data+32+16
+    * AES128(data) ref:      &data+32+16 : 
     */
-    sgx_status_t ret = sgx_rijndael128GCM_decrypt
+
+    //ocall_print_secret(enc_data, enc_data_size); //ok
+
+    uint8_t iv [16];
+    memcpy(iv, enc_data+32, 16);
+
+    ret = sgx_aes_ctr_decrypt
         (&aes_key,
-        enc_data + 16 + 12,
-        enc_data_size-12-16,
-        plain_data,
-        enc_data + 16,
-        12,
-        NULL,
-        0,
-        (const sgx_aes_gcm_128bit_tag_t*)(&enc_data[0]));
+        enc_data+32+16,
+        plain_data_size,
+        enc_data+32,
+        128,
+        plain_data);
+    
+    if(ret != SGX_SUCCESS)
+        return ret;
+
+    uint8_t data_to_be_hashed[plain_data_size+16];
+    memcpy(data_to_be_hashed, plain_data, plain_data_size);
+    memcpy(data_to_be_hashed+plain_data_size, iv, 16);
+
+    //ocall_print_string((const char*)data_to_be_hashed); //ok
+    //ocall_print_secret(data_to_be_hashed,plain_data_size+16); //ok
+
+    sgx_sha256_hash_t hash = {0};
+    ret = sgx_sha256_msg
+        (data_to_be_hashed,
+        plain_data_size+16,
+        &hash);
+    
+    if(ret != SGX_SUCCESS)
+        return ret;
+
+    int different = memcmp(hash, enc_data, 32);
+    if(different != 0)
+        return SGX_ERROR_MAC_MISMATCH;
 
     return ret;
 }
@@ -240,7 +283,7 @@ server_error_t enclave_query_db(
     ret = (int) enclave_get_encrypted(data, *p_data_size, encrypted, &encrypted_size);
     if(ret) return (server_error_t)ret;
 
-    uint32_t plain_data_size = encrypted_size - 12 - 16;
+    uint32_t plain_data_size = encrypted_size - 32 - 16;
     if(plain_data_size+1 > *p_data_size)
         return RESULT_BUFFER_OVERFLOW_ERROR;
     uint8_t plain_data[plain_data_size];
@@ -314,7 +357,7 @@ server_error_t enclave_multi_query_db(
         if(ret) 
             return (server_error_t)ret;
 
-        plain_data_size = encrypted_size - 12 - 16;
+        plain_data_size = encrypted_size - 32 - 16;
         if(plain_data_size > max_plain_data_size) 
             return RESULT_BUFFER_OVERFLOW_ERROR;
 
@@ -366,7 +409,7 @@ server_error_t enclave_build_result(
     memcpy(&str[28], pk, 8);
     memcpy(&str[42], type, 6);
     memcpy(&str[52], fw, 6);
-    memcpy(&str[62], type, 6);
+    memcpy(&str[62], vn, 6);
     
     memset(result, 0, *p_resullt_size);
     memcpy(result, &str[0], 77);

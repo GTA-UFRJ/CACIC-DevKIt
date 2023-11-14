@@ -7,6 +7,7 @@
 #include <openssl/aes.h>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
+#include <openssl/sha.h>
 
 #include "encryption.h"
 
@@ -29,12 +30,12 @@ int encrypt_data (
     OpenSSL_add_all_ciphers();
 
     // Encrypted data:      | MAC | IV | AES128(data)
-    // Buffer size:           16    12   size(data)
-    // MAC reference:         &data       :   &data+16
-    // IV reference:          &data+16    :   &data+16+12
-    // AES128(data) ref:      &data+12+16 : 
-    size_t mac_size = 16;
-    size_t iv_size = 12;
+    // Buffer size:           32    16   size(data)
+    // MAC reference:         &data       :   &data+32
+    // IV reference:          &data+32    :   &data+32+16
+    // AES128(data) ref:      &data+32+16 : 
+    size_t mac_size = 32;
+    size_t iv_size = 16;
     unsigned char mac[mac_size];
     unsigned char iv[iv_size];
 
@@ -50,7 +51,7 @@ int encrypt_data (
     
     // Generate nonce (initialization vector IV)
     //srand(time(NULL));
-    for(int i=0;i<12;i++)
+    for(int i=0;i<iv_size;i++)
         //iv[i] = static_cast<uint8_t>(rand()%10) + 48;
         iv[i] = 0;      // use 0 for testing
     // Encrypted data: MAC | IV | AES128(data)
@@ -61,18 +62,28 @@ int encrypt_data (
 
     // Perform the encryption of the plaintext
     // Encrypted data: MAC | IV | AES128(data)
-    EVP_EncryptInit(e_ctx, EVP_aes_128_gcm(), (const unsigned char*)key, iv);
+    EVP_EncryptInit(e_ctx, EVP_aes_128_ctr(), (const unsigned char*)key, iv);
     EVP_EncryptUpdate(e_ctx, &output[mac_size + iv_size], &actual_size, (const unsigned char*)plain_data, plain_data_size);
     EVP_EncryptFinal(e_ctx, &output[mac_size + iv_size + actual_size], &final_size);
     //printf("actual = %d and final = %d\n", actual_size, final_size);
     
-    // Retrieve the authentication tag using EVP_CIPHER_CTX_ctrl function
-    EVP_CIPHER_CTX_ctrl(e_ctx, EVP_CTRL_GCM_GET_TAG, mac_size, mac);
-    std::copy(mac, mac + mac_size, output.begin());
+    // Cleanup the encryption context
+    EVP_CIPHER_CTX_free(e_ctx);
 
+    uint8_t* data_to_be_hashed = (uint8_t*)malloc(plain_data_size+iv_size);
+    memcpy(data_to_be_hashed, plain_data, plain_data_size);
+    memcpy(data_to_be_hashed+plain_data_size, &output[mac_size], iv_size);
+
+    // Retrieve the authentication tag using SHA-256 hash of the data
+    unsigned char sha256_hash[SHA256_DIGEST_LENGTH];
+    SHA256(data_to_be_hashed, plain_data_size+iv_size, sha256_hash); 
+    std::copy(sha256_hash, sha256_hash + mac_size, output.begin());
+
+    free(data_to_be_hashed);
     memcpy(enc_data, output.data(), real_size);
 
-    EVP_CIPHER_CTX_free(e_ctx);
+    //quick_decrypt_debug(key, enc_data, *enc_data_size);
+
     return 0;
 }
 
@@ -86,12 +97,12 @@ int decrypt_data (
     OpenSSL_add_all_ciphers();
 
     // Encrypted data:      | MAC | IV | AES128(data)
-    // Buffer size:           16    12   size(data)
-    // MAC reference:         &data       :   &data+16
-    // IV reference:          &data+16    :   &data+16+12
-    // AES128(data) ref:      &data+12+16 : 
-    size_t mac_size = 16;
-    size_t iv_size = 12;
+    // Buffer size:           32    16   size(data)
+    // MAC reference:         &data       :   &data+32
+    // IV reference:          &data+32    :   &data+32+16
+    // AES128(data) ref:      &data+32+16 : 
+    size_t mac_size = 32;
+    size_t iv_size = 16;
     unsigned char mac[mac_size];
     unsigned char iv[iv_size];
     memcpy(mac, enc_data, mac_size);
@@ -106,25 +117,43 @@ int decrypt_data (
         return -1;
     *plain_data_size = real_size;
     plaintext.resize(real_size, '\0');
+    //printf("Aqui 1\n");
 
     // Create a new decryption context using the EVP_CIPHER_CTX_new function
     EVP_CIPHER_CTX *d_ctx = EVP_CIPHER_CTX_new();
 
     // Perform the decryption of the ciphertext
-    EVP_DecryptInit(d_ctx, EVP_aes_128_gcm(), (const unsigned char*)key, iv);
+    EVP_DecryptInit(d_ctx, EVP_aes_128_ctr(), (const unsigned char*)key, iv);
     EVP_DecryptUpdate(d_ctx, &plaintext[0], &actual_size, &enc_data[mac_size+iv_size], real_size);
-    EVP_CIPHER_CTX_ctrl(d_ctx, EVP_CTRL_GCM_SET_TAG, mac_size, mac);
-    EVP_DecryptFinal(d_ctx, &plaintext[actual_size], &final_size);
+
+    // Cleanup the encryption context
+    EVP_CIPHER_CTX_free(d_ctx);
+
+    //printf("%s\n",plaintext.data()); ok
+    size_t plain_size = plaintext.size();
+
+    uint8_t* data_to_be_hashed = (uint8_t*)malloc(plain_size+iv_size);
+    memcpy(data_to_be_hashed, plaintext.data(), plain_size);
+    memcpy(data_to_be_hashed+plain_size, iv, iv_size);
+
+    // Retrieve the authentication tag using SHA-256 hash of the data
+    unsigned char sha256_hash[SHA256_DIGEST_LENGTH];
+    SHA256(data_to_be_hashed, plain_size+iv_size, sha256_hash); 
+    free(data_to_be_hashed);
+
+    int different = memcmp(sha256_hash, mac, mac_size);
+    if(different != 0)
+        return -1;
+    //printf("Aqui 2\n");
 
     memcpy(plain_data, plaintext.data(), real_size);
 
-    EVP_CIPHER_CTX_free(d_ctx);
     return 0;
 }
 
 
 void quick_decrypt_debug (uint8_t* key, uint8_t* enc, uint32_t enc_size) {
-    uint32_t plain_size = enc_size - 12 - 16;
+    uint32_t plain_size = enc_size - 32 - 16;
     uint8_t plain[plain_size+1];
     decrypt_data(key, enc, enc_size, plain, &plain_size);
     plain[plain_size] = '\0';

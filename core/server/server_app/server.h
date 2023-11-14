@@ -35,7 +35,7 @@ typedef struct access_message_t
     uint32_t index;
     uint32_t command_size;
     char* command;
-    uint8_t encrypted[8+16+12+1];
+    uint8_t encrypted[8+32+16+1];
 } access_message_t;
 
 // Structure of the message written to database
