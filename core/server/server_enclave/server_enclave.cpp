@@ -49,6 +49,7 @@
 #include "server.h"
 #include "server_tasks_calls.h"
 #include "server_enclave_auxiliary.h"
+#include "config_macros.h"
 
 //#include "server_ocall.h"
 
@@ -102,6 +103,8 @@ sgx_status_t enclave_publication_wrapper(
 
     if(debug) ocall_print_string("\nDecrypt encrypted field of publication message");
 
+    //ocall_print_secret(encrypted, encrypted_size);
+
     uint32_t decrypted_size = encrypted_size - 32 - 16;
     uint8_t decrypted [decrypted_size+1];
     decrypted[decrypted_size] = 0;
@@ -111,7 +114,7 @@ sgx_status_t enclave_publication_wrapper(
         *p_error_code = (int)MESSAGE_DECRYPTION_ERROR;
         return ret;
     }
-    if(debug) ocall_print_string((const char*)decrypted);
+    //if(debug) ocall_print_string((const char*)decrypted);
 
 
     if(debug) ocall_print_string("\nVerify if IDs are equal");
@@ -123,7 +126,7 @@ sgx_status_t enclave_publication_wrapper(
 
     if(debug) ocall_print_string("\nGet payload field inside decrypted");
 
-    uint32_t payload_size = 1024;
+    uint32_t payload_size = 2048;
     char payload[payload_size];
     *p_error_code = enclave_get_payload(&decrypted[0], decrypted_size, &payload[0], &payload_size);
 
@@ -141,7 +144,7 @@ sgx_status_t enclave_publication_wrapper(
 
     if(debug) ocall_print_string("\nCall task");
 
-    uint32_t result_payload_size = 128;
+    uint32_t result_payload_size = 2048;
     uint8_t result_payload[result_payload_size];
 
     if(task != NULL) {
@@ -182,7 +185,7 @@ sgx_status_t enclave_publication_wrapper(
 
     if(debug) ocall_print_string("\nBuild result");
 
-    uint32_t result_size = 1024;
+    uint32_t result_size = 2048;
     uint8_t result[result_size];
     *p_error_code = enclave_build_result
         (time, 
@@ -293,7 +296,7 @@ sgx_status_t enclave_retrieve_data(
     }
 
     if(debug) ocall_print_string("\nDecrypt encrypted stored data");
-    //ocall_print_secret(encrypted_data,encrypted_data_size);
+    ocall_print_secret(encrypted_data,encrypted_data_size);
 
     // Decrypt encrypted stored data
     uint32_t decrypted_size = encrypted_data_size - 32 - 16;
@@ -305,7 +308,7 @@ sgx_status_t enclave_retrieve_data(
         return ret;
     }
     decrypted[decrypted_size] = 0;
-    if(debug) ocall_print_string((const char*)decrypted);
+    //if(debug) ocall_print_string((const char*)decrypted);
 
     if(debug) ocall_print_string("\nVerify access permissions");
 

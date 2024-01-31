@@ -238,6 +238,8 @@ server_error_t server_publish(const Request& req, Response& res, sgx_enclave_id_
     uint32_t returned_encrypted_data_size = MAX_ENC_DATA_SIZE;
     char* returned_encrypted_data = (char*)malloc(returned_encrypted_data_size);
 
+    //debug_print_encrypted(rcv_msg.encrypted_size, rcv_msg.encrypted);
+
     sgx_status_t sgx_ret;
     sgx_status_t ecall_status;
     int enc_ret = (int)OK;

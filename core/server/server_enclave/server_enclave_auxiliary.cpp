@@ -103,6 +103,8 @@ sgx_status_t enclave_decrypt_data(
     if(ret != SGX_SUCCESS)
         return ret;
 
+    //ocall_print_string((char*)plain_data);
+
     uint8_t data_to_be_hashed[plain_data_size+16];
     memcpy(data_to_be_hashed, plain_data, plain_data_size);
     memcpy(data_to_be_hashed+plain_data_size, iv, 16);

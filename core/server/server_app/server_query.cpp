@@ -164,7 +164,9 @@ server_error_t get_response(stored_data_t stored,
     sgx_status_t sgx_ret = SGX_SUCCESS;
     sgx_status_t ecall_status = SGX_SUCCESS;
     int enc_ret = (int)ACCESS_DENIED;
-    
+
+    //debug_print_encrypted(stored.encrypted_size, stored.encrypted);
+
     sgx_ret = enclave_retrieve_data(global_eid, &ecall_status,
         DEBUG_PRINT,
         (sgx_sealed_data_t*)querier_sealed_data,
@@ -194,14 +196,14 @@ server_error_t get_response(stored_data_t stored,
 void make_response(uint8_t* enc_data, uint32_t enc_data_size, char* response)
 {
     if(DEBUG_TIMER) Timer t("make_response");
-    sprintf(response, "size|0x%02x|data|", enc_data_size);
+    sprintf(response, "size|0x%03x|data|", enc_data_size);
     char auxiliar[7];
     for (uint32_t count=0; count<enc_data_size; count++)
     {
         sprintf(auxiliar, "%02x-", enc_data[count]);
-        memcpy(&response[15+count*3], auxiliar, 3);
+        memcpy(&response[16+count*3], auxiliar, 3);
     }
-    response[15+enc_data_size*3] = '\0';
+    response[16+enc_data_size*3] = '\0';
     
     if(DEBUG_PRINT) printf("Message: %s\n", response);
 }

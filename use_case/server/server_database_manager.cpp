@@ -56,7 +56,7 @@ static int callback_query(void* received_from_exec, int num_columns, char** colu
     }
     
     // Build the data string
-    sprintf(new_data, "time|%s|type|%s|pk|%s|fw|%s|vn|%s|size|0x%02x|encrypted|",  
+    sprintf(new_data, "time|%s|type|%s|pk|%s|fw|%s|vn|%s|size|0x%03x|encrypted|",  
             columns_values[1], 
             columns_values[2], 
             columns_values[3], 
@@ -74,7 +74,7 @@ static int callback_query(void* received_from_exec, int num_columns, char** colu
         auxiliar[2] = '\0';
         //printf("%s ", auxiliar);
         
-        new_data[89+byte_index] = (char)strtoul(auxiliar, &invalid_character, 16);
+        new_data[90+byte_index] = (char)strtoul(auxiliar, &invalid_character, 16);
         if(*invalid_character != 0) {
             printf("Invalid character in encrypted field: %c\n", *invalid_character);
             return -1;
@@ -84,7 +84,7 @@ static int callback_query(void* received_from_exec, int num_columns, char** colu
 
     // Updtae structure for next callback call
     received_from_exec_tranformed->datas[received_from_exec_tranformed->data_count] = new_data;
-    received_from_exec_tranformed->datas_sizes[received_from_exec_tranformed->data_count] = 89+encrypted_size;
+    received_from_exec_tranformed->datas_sizes[received_from_exec_tranformed->data_count] = 90+encrypted_size;
     received_from_exec_tranformed->data_count++;
 
     return 0;

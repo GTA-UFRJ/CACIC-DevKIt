@@ -57,7 +57,7 @@ int publish_interface(int argc, char** argv)
 
     // Fill client data structure
     client_data_t data;
-    data.payload = (char*)malloc(strlen(argv[3])+1);
+    data.payload = (char*)malloc(strlen(argv[5])+1);
     get_time(data.time);
     sprintf(data.pk, "%s", id.pk);
     sprintf(data.type, "%s", argv[2]);

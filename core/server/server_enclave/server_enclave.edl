@@ -55,7 +55,7 @@ enclave {
             [in,size=7] char* vn,
             [in,size=encrypted_size] uint8_t* encrypted,
             uint32_t encrypted_size,
-            [out,size=2096] char* processed_data,
+            [out,size=4144] char* processed_data,
             [out,count=1] uint32_t* p_processed_data_size,
             [out,count=1] int* p_error_code);
 
@@ -87,13 +87,13 @@ enclave {
         void ocall_print_number(long number);
 
         void ocall_print_string(
-            [in,size=1024]const char* text);
+            [in,size=2048]const char* text);
 
         void ocall_query_db(
             [out,count=1] int* p_ret,
             [in,size=2048] char* command, 
             uint32_t index, 
-            [out,size=1024] char* data, 
+            [out,size=4096] char* data, 
             [out,count=1] uint32_t* p_data_size);
         
         void ocall_multi_query_db(
