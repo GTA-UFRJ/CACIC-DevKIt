@@ -40,7 +40,10 @@ def get_ck_key(id):
     if(error_code != Server_error.OK):
         return None, error_code
 
-    ca = get_ca_key()
+    ca, error_code = get_ca_key()
+    if(error_code != Server_error.OK):
+        return None, error_code
+    
     plain_ck, error_code = decrypt(encrypted_ck, ca)
     
     return plain_ck, error_code

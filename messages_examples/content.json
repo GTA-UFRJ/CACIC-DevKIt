@@ -1,0 +1,8 @@
+{
+    "content": {
+      "sid": "12345678",
+      "vn": "00000023",
+      "payload_size_dec": 36,
+      "payload": "[bytes!!]"
+    }
+  }

@@ -8,6 +8,7 @@ from scacic_publish import Publication
 from scacic_macros import SERVER_IP, SERVER_PORT
 from scacic_utils import * 
 
+# TODO: colocar multithreaded
 class Request_handler(BaseHTTPRequestHandler):
 
     def finalize_if_failed(self, publication):
@@ -25,17 +26,14 @@ class Request_handler(BaseHTTPRequestHandler):
     def do_GET(self):
         print_if_debug("Server received ", self.path)
 
-        publication = Publication(self.path)
-        self.finalize_if_failed(publication)
-
-        publication.publication_request_exec()
-        self.finalize_if_failed(publication)
-
-        publication.publish_result()
-        self.finalize_if_failed(publication)
-
-        print_if_debug("Published with success")
-        self.finalize()
+        try:
+            publication = Publication(self.path)
+            publication.publication_request_exec()
+            publication.publish_result()
+            print_if_debug("Published with success")
+            self.finalize()
+        except Exception:
+            self.finalize_if_failed(publication)
 
 def main():
     print('SCACIC server is starting on IP ', SERVER_IP, ' and port ', SERVER_PORT)

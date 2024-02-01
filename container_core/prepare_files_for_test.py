@@ -3,17 +3,41 @@ import secrets
 from scacic_utils import * 
 import sys
 
-sys.stdout = open("./container_core/test_id_and_key", 'w')
+# TODO: encrypt key 
+
+#sys.stdout = open("./container_core/test_id_and_key", 'w')
 
 ca = bytes(16)
-f = open('./core/server/resources/storage_key_container', 'wb')
+print("CA: ", convert_bytes_to_text(ca))
+ca_path = './core/server/resources/storage_key_container'
+f = open(ca_path, 'wb')
 f.write(ca)
 f.close()
+print("Written in created file: ", ca_path, end='\n\n')
 
 id = secrets.token_hex(4)
-print("id: ", id)
+print("ID: ", id)
+client_file_path = './core/server/resources/'+id+"_container"
+f = open(client_file_path, 'wb')
+print("Created file: ", client_file_path, end='\n\n')
+
 ck = secrets.token_bytes(16)
-print("ck: ", convert_bytes_to_text(ck))
-f = open('./core/server/resources/'+id+"_container", 'wb')
-f.write(ck)
+print("CK: ", convert_bytes_to_text(ck))
+
+enc_ck, error = encrypt(ck,ca)
+if error:
+    exit(error)
+print("CK encrypted with CA: ", convert_bytes_to_text(enc_ck))
+
+print("Testing decryption")
+dec_ck, error = decrypt(enc_ck,ca)
+if error:
+    exit(error)
+if(dec_ck != ck):
+    print("Decryption test failed. Decrypted CK: ", dec_ck)
+    exit(-1)
+print("Decryption successfull")
+
+f.write(enc_ck)
 f.close()
+print("Written in file: ", client_file_path, end='\n\n')

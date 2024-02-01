@@ -1,0 +1,15 @@
+{
+    "query_1": {
+      "id": "72d41281",
+      "command_size_dec": 14,
+      "command": {
+        "id": null,
+        "type": "sw_block",
+        "sid": "12345678",
+        "vn": "00000023",
+        "index": 1
+      },
+      "enc_size_dec": 34,
+      "enc_command": "[bytes!!!]"
+    }
+  }

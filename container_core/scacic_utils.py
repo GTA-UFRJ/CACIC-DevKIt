@@ -5,16 +5,23 @@
 from Crypto.Cipher import AES
 from scacic_errors import Server_error
 import random
-from scacic_databse_calls import *
-from scacic_disk_manager import get_ca_key
+#from scacic_databse_calls import *
+#rom scacic_disk_manager import get_ca_key
 import secrets
 from scacic_macros import *
+from datetime import datetime
 
-def print_if_debug(*args):
+def get_time():
+    current_datetime = datetime.now()
+    desired_format = "%Y-%m-%d.%H:%M:%S"
+    formatted_time = current_datetime.strftime(desired_format)
+    return formatted_time
+
+def print_if_debug(*args, sep=''):
     if DEBUG:
         result = ""
         for arg in args:
-            result += str(arg)
+            result = result + str(arg) + sep
         print(result)
 
 def convert_text_to_bytes(text):
@@ -40,21 +47,20 @@ def separare_fields_encrypted(encrypted_data):
 def build_fields_encrypted(mac, data, nonce):
     return mac + nonce + data
 
-def encrypt(plaintext, key, return_format='bytes'):
+# TODO: mudar para AES-CTR
+def encrypt(input, key):
     try:    
         encobj = AES.new(key, AES.MODE_GCM, nonce=get_random_nonce())
-        ciphertext, auth_tag = encobj.encrypt_and_digest(plaintext.encode())
+        ciphertext, auth_tag = encobj.encrypt_and_digest(input)
     except Exception as e:
         print("Encryption error: ", e)
         return None, Server_error.print_error(Server_error.DATA_ENCRYPTION_ERROR)
 
     result_bytes = build_fields_encrypted(auth_tag, ciphertext, encobj.nonce)
 
-    if (return_format == 'text'):
-        return convert_bytes_to_text(result_bytes), Server_error.OK
     return result_bytes, Server_error.OK
 
-def decrypt(encrypted_data, key, return_format='bytes'):
+def decrypt(encrypted_data, key):
     auth_tag, nonce, ciphertext, error_code = separare_fields_encrypted(encrypted_data)
     if(error_code != Server_error.OK):
         return None, error_code
@@ -66,12 +72,10 @@ def decrypt(encrypted_data, key, return_format='bytes'):
         print("Decryption error: ", e)
         return None, Server_error.print_error(Server_error.MESSAGE_DECRYPTION_ERROR)
 
-    if(return_format == 'text'):
-        return plaintext.decode('ascii'), Server_error.OK 
-
     return plaintext, Server_error.OK
 
 # time|...|pk|...|type|...|payload|...|permission1|...|permission2|...
+# TODO: fw_id=...&pk=...&vn=...&payload=...&permissions={}
 def parse_fields_decrypted(decrypted):
     fields_list = decrypted.split('|')
     if(len(fields_list) < 10):
@@ -93,11 +97,11 @@ if __name__ == '__main__':
     key = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
     plaintext = 'teste'
     print("Plaintext: ", plaintext, '(%d)'%len(plaintext))
-    encrypted, error = encrypt(plaintext, key)
+    encrypted, error = encrypt(plaintext.encode(), key)
     if error != Server_error.OK:
         exit()
     print("Encrypted: ", convert_bytes_to_text(encrypted), '(%d)'%(len(convert_bytes_to_text(encrypted))/3))
-    decrypted, error = decrypt(encrypted, key, return_format='text')
+    decrypted, error = decrypt(encrypted, key)
     if error != Server_error.OK:
         exit()
-    print("Decrypted: ", decrypted, '(%d)'%len(plaintext))
+    print("Decrypted: ", decrypted.decode(), '(%d)'%len(plaintext))

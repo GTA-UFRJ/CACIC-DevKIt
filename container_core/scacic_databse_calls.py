@@ -8,6 +8,7 @@ from scacic_macros import DATABASE_PATH
 from scacic_errors import Server_error
 from scacic_utils import *
 
+# TODO: expand database columns
 def create_db():
     connection = connect(DATABASE_PATH)
     cursor = connection.cursor()
@@ -27,7 +28,7 @@ def create_db():
 def db_publish(time, pk, type, result):
     id = get_random_id()
     enc_text = convert_bytes_to_text(result)
-    #enc_text="a5-23-12-f1-ab-"
+    #enc_text = "a5-23-12-f1-ab-"
 
     command = f"""
     INSERT INTO TACIOT (ID, TIME, TYPE, PK, SIZE, ENCRYPTED)
@@ -94,7 +95,7 @@ def db_multi_query(command):
 # Test code
 if __name__ == "__main__":
     #create_db()
-    #db_publish('horario', '72d41281', 123456, "a5-23-12-f1-ab-")
+    db_publish('horario', '72d41281', 123456, "a5-23-12-f1-ab-")
     data, error = db_query('select * from taciot where type=123456',0)
     #data, error = db_multi_query('select * from taciot where type=123456')
     if(error == Server_error.OK):
