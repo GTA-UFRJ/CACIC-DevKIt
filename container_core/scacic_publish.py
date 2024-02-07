@@ -48,15 +48,18 @@ class Publication:
 
         if(authenticate_client(self.id, decrypted_fields['id'])):
             self.error = Server_error.print_error(Server_error.AUTHENTICATION_ERROR)
-        print_if_debug("Client ", self.id, " authenticated!")
+        else:
+            print_if_debug("Client ", self.id, " authenticated!")
         
     def encrypt_result(self, plain_result):
-        ca = get_ca_key()
+        ca, error_code = get_ca_key()
+        if(error_code != Server_error.OK):
+            return None, error_code
         self.encrypted_result, self.error = encrypt(plain_result.encode(), ca)
 
     # TODO: mudar formato aqui também
     def build_result(self):
-        prefix_list = ['permissions{}'.format(i+1) for i in range(len(self.permissions_list))]
+        prefix_list = ['permissions{}'.format(i) for i in range(len(self.permissions_list))]
         permissions_str = '|'.join([elem for pair in zip(prefix_list, self.permissions_list) for elem in pair])
         plain_result = "time|{}|pk|{}|type|{}|payload|{}|{}".format(self.time, self.id, self.type, self.result_payload, permissions_str)
         print_if_debug("Generated plain result payload: ", plain_result)
@@ -90,3 +93,5 @@ class Publication:
             raise
 
         self.build_result()
+        if(self.error != Server_error.OK):
+            raise

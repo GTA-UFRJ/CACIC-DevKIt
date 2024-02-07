@@ -20,7 +20,9 @@ ck, _ = decrypt(enc_ck, ca)
 print("ID: ", id)
 print("CK: ", convert_bytes_to_text(ck))
 
-enc, _ = encrypt('testing'.encode(), ck)
+payload = "time|10h30m47s|pk|72d41281|type|123456|payload|250|permission1|72d41281"
+
+enc, _ = encrypt(payload.encode(), ck)
 time = get_time()
 enc_text = convert_bytes_to_text(enc)
 request = 'time|' + time + '|pk|' + id + '|type|555555|size|' + str(len(enc_text)) + '|encrypted|' + enc_text
@@ -39,5 +41,9 @@ try:
         print(header_received)
 except:
     print("Could not stabilish/mantain connection")
+
+key = input("Type any key to test query. Type 'q' to exit.")
+if(key == 'q' or key == "Q"):
+    exit(0)
 
 connection.close()
