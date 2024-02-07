@@ -46,4 +46,29 @@ key = input("Type any key to test query. Type 'q' to exit.")
 if(key == 'q' or key == "Q"):
     exit(0)
 
+# QUERY
+
+# pk|72d41281|index|000000|size|23|command|SELECT_*_FROM_TACIOT_WHERE_TYPE='555555'|encrypted|
+index = 1
+command = "SELECT_*_FROM_TACIOT_WHERE_TYPE='555555'"
+enc, _ = encrypt(id.encode(), ck)
+enc_text = convert_bytes_to_text(enc)
+request = "pk|" + id + "|index|" + str(index).zfill(6) + "|size|" + format(len(command),'02x') + "|command|" + command + "|encrypted|" + enc_text
+
+print(request)
+
+complete_request = '/query/size=' + str(len(request)) + '/' + request
+
+try:
+    connection.request('GET', complete_request)
+    response = connection.getresponse()
+
+    if(response.status != 200):
+        print("Error ", response.status, ": ", response.reason)
+    else:
+        header_received = response.getheader('return')
+        print(header_received)
+except:
+    print("Could not stabilish/mantain connection")
+
 connection.close()

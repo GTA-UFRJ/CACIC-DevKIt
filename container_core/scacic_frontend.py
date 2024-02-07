@@ -51,9 +51,9 @@ class Request_handler(BaseHTTPRequestHandler):
 
         msg_type = self.path.split('/')[1]
 
-        if(msg_type == "Publication"):
+        if(msg_type == "publish"):
             self.publish()
-        elif(msg_type == "Query"):
+        elif(msg_type == "query"):
             self.query()
         else:
             print_if_debug("Unknown message type")

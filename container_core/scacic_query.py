@@ -17,7 +17,6 @@ class Query:
         self.parse_fields(message)
         if(self.succeeded()):
             self.enc_bytes = convert_text_to_bytes(self.enc_text)
-            self.set_task()
     
     # pk|72d41281|index|000000|size|23|command|SELECT_*_FROM_TACIOT_WHERE_TYPE='555555'|encrypted|
     def parse_fields(self, message):
@@ -73,14 +72,14 @@ class Query:
         decrypted = decrypted.decode()
         if(self.error != Server_error.OK):
             raise
-        print_if_debug("Decrypted id: ", decrypted)
         
-        if(authenticate_client(self.id, decrypted)):
+        if(not authenticate_client(self.id, decrypted)):
             self.error = Server_error.print_error(Server_error.AUTHENTICATION_ERROR)
             raise
         
         print_if_debug("Client ", self.id, " authenticated!")
 
+        # Bug here
         self.retrieve_data()
         if(self.error != Server_error.OK):
             raise
