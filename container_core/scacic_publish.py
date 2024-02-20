@@ -9,6 +9,7 @@ from scacic_disk_manager import *
 from scacic_utils import *
 from scacic_databse_calls import *
 
+# TODO: substituir códigos de erro por exceções (no query tmb)
 class Publication:
 
     def __init__(self, message):

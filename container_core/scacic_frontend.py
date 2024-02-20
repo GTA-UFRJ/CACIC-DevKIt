@@ -12,11 +12,23 @@ from scacic_utils import *
 # TODO: colocar multithreaded
 class Request_handler(BaseHTTPRequestHandler):
 
-    def finalize_if_failed(self, message_polymorphic_object):
-        if(message_polymorphic_object.succeeded()):
-            return
+    def error_response(self, pub_or_query):
         self.send_response(200)
-        self.send_header('return', str(message_polymorphic_object.error))
+        if(pub_or_query.error == Server_error.OK):
+            pub_or_query.error = -1
+        self.send_header('return', str(pub_or_query.error))
+        self.end_headers() 
+
+    def successfull_publication_response(self):
+        print_if_debug("Published with success")
+        self.send_response(200)
+        self.send_header('return', 'ack')
+        self.end_headers() 
+
+    def successfull_query_response(self, query):
+        print_if_debug("Queried with success")
+        self.send_response(200)
+        self.send_header('return', query.respone)
         self.end_headers() 
 
     def publish(self):
@@ -24,27 +36,19 @@ class Request_handler(BaseHTTPRequestHandler):
             publication = Publication(self.path)
             publication.publication_request_exec()
             publication.publish_result()
-
-            print_if_debug("Published with success")
-            self.send_response(200)
-            self.send_header('return', 'ack')
-            self.end_headers() 
+            self.successfull_publication_response()
 
         except Exception:
-            self.finalize_if_failed(publication)
+            self.error_response(publication)
 
     def query(self):
         try:
             query = Query(self.path)
             query.query_request_exec()
-
-            print_if_debug("Queried with success")
-            self.send_response(200)
-            self.send_header('return', query.respone)
-            self.end_headers() 
+            self.successfull_query_response(query)
 
         except Exception:
-            self.finalize_if_failed(query)
+            self.error_response(query)
 
     def do_GET(self):
         print_if_debug("Server received ", self.path)

@@ -24,7 +24,10 @@ class Query:
         if(len(fields_list) != 10):
             self.error = Server_error.print_error(Server_error.INVALID_ENCRYPTED_FIELD_ERROR)
             raise
-        self.id, self.index, self.size, self.command, self.enc_text = [fields_list[index] for index in range(len(fields_list)) if index % 2 != 0]
+        self.id, index, size, self.command, self.enc_text = [fields_list[index] for index in range(len(fields_list)) if index % 2 != 0]
+        # TODO: error handlling
+        self.index = int(index)
+        self.size = int(size,base=16)
         print_if_debug("Parsed fields: ", self.id, self.index, self.size, self.command, self.enc_text, sep=' ')
 
     def succeeded(self):
@@ -41,7 +44,8 @@ class Query:
         if(self.error != Server_error.OK):
             return
 
-        self.retrieved_data['decrypted_from_db'], self.error = decrypt(self.retrieved_data['encrypted'], ca)
+        decrypted, self.error = decrypt(self.retrieved_data['encrypted'], ca)
+        self.retrieved_data['decrypted_from_db'] = decrypted.decode()
         if(self.error != Server_error.OK):
             return
         
@@ -79,7 +83,6 @@ class Query:
         
         print_if_debug("Client ", self.id, " authenticated!")
 
-        # Bug here
         self.retrieve_data()
         if(self.error != Server_error.OK):
             raise
@@ -90,7 +93,7 @@ class Query:
         
         print_if_debug("Access allowed!")
 
-        encrypted, self.error = encrypt(self.retrieved_data['decrypted_from_db'], self.ck)
+        encrypted, self.error = encrypt(self.retrieved_data['decrypted_from_db'].encode(), self.ck)
         if(self.error != Server_error.OK):
             raise
 

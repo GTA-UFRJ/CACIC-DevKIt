@@ -79,7 +79,7 @@ class Server_error:
                 Server_error.OPEN_SERVER_KEY_FILE_ERROR: "Failed to open the server file",
                 Server_error.MESSAGE_DECRYPTION_ERROR: "Error decrypting publisher message",
                 Server_error.AUTHENTICATION_ERROR: "Invalid encrypted pk. Could not authenticate client",
-                Server_error.DATA_ENCRYPTION_ERROR: "Error encrypting data for storing",
+                Server_error.DATA_ENCRYPTION_ERROR: "Error encrypting data",
                 Server_error.ENCRYPTED_OVERFLOW_ERROR: "Insuficient memory for encrypted result",
                 Server_error.NO_PROCESSING_ENCLAVE_ERROR: "Enclave problem inside no_processing_s()",
                 Server_error.DB_INSERT_EXECUTION_ERROR: "Failed to publish message",

@@ -20,7 +20,7 @@ ck, _ = decrypt(enc_ck, ca)
 print("ID: ", id)
 print("CK: ", convert_bytes_to_text(ck))
 
-payload = "time|10h30m47s|pk|72d41281|type|123456|payload|250|permission1|72d41281"
+payload = "time|10h30m47s|pk|72d41281|type|123456|payload|250|permission1|" + id
 
 enc, _ = encrypt(payload.encode(), ck)
 time = get_time()
@@ -49,7 +49,7 @@ if(key == 'q' or key == "Q"):
 # QUERY
 
 # pk|72d41281|index|000000|size|23|command|SELECT_*_FROM_TACIOT_WHERE_TYPE='555555'|encrypted|
-index = 1
+index = 29
 command = "SELECT_*_FROM_TACIOT_WHERE_TYPE='555555'"
 enc, _ = encrypt(id.encode(), ck)
 enc_text = convert_bytes_to_text(enc)
@@ -68,6 +68,9 @@ try:
     else:
         header_received = response.getheader('return')
         print(header_received)
+        bytes = convert_text_to_bytes(header_received.split('|')[3])
+        data,_ = decrypt(bytes, ck)
+        print(data.decode())
 except:
     print("Could not stabilish/mantain connection")
 
