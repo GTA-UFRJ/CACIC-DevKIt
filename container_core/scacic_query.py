@@ -33,8 +33,7 @@ class Query:
     def succeeded(self):
         return (self.error == Server_error.OK)
     
-    # time|...|pk|...|type|...|payload|...|permission1|...|permission2|...
-    
+    # time|...|pk|...|type|...|fw|...|vn|...|payload|...|permission1|...|permission2|...
     def retrieve_data(self):
         self.retrieved_data, self.error = db_query(self.command, self.index)
         if(self.error != Server_error.OK):
@@ -53,7 +52,11 @@ class Query:
         if(self.error != Server_error.OK):
             return 
         self.retrieved_data['payload'], self.retrieved_data['permissions_list'] = decrypted_fields['payload'], decrypted_fields['perms_list']
-        
+
+        if(self.retrieved_data['fw'] != decrypted_fields['fw'] or self.retrieved_data['vn'] != decrypted_fields['vn']):
+            self.error = Server_error.print_error(Server_error.DATA_VALIDITY_ERROR)
+            return
+
         print_if_debug("Retrieved data: ", self.retrieved_data)
 
         #if(decrypted_fields['id'] != self.retrieved_data['id']):

@@ -20,12 +20,12 @@ ck, _ = decrypt(enc_ck, ca)
 print("ID: ", id)
 print("CK: ", convert_bytes_to_text(ck))
 
-payload = "time|10h30m47s|pk|72d41281|type|123456|payload|250|permission1|" + id
+payload = "time|10h30m47s|pk|72d41281|type|123456|fw|654321|vn|789101|payload|250|permission1|" + id
 
 enc, _ = encrypt(payload.encode(), ck)
 time = get_time()
 enc_text = convert_bytes_to_text(enc)
-request = 'time|' + time + '|pk|' + id + '|type|555555|size|' + str(len(enc_text)) + '|encrypted|' + enc_text
+request = 'time|' + time + '|pk|' + id + '|type|555555|fw|654321|vn|789101|size|' + str(len(enc_text)) + '|encrypted|' + enc_text
 print(request)
 
 complete_request = '/publish/size=' + str(len(request)) + '/' + request
@@ -37,7 +37,7 @@ try:
     if(response.status != 200):
         print("Error ", response.status, ": ", response.reason)
     else:
-        header_received = response.getheader('return')
+        header_received = response.getheader('return_status')
         print(header_received)
 except:
     print("Could not stabilish/mantain connection")
@@ -49,7 +49,7 @@ if(key == 'q' or key == "Q"):
 # QUERY
 
 # pk|72d41281|index|000000|size|23|command|SELECT_*_FROM_TACIOT_WHERE_TYPE='555555'|encrypted|
-index = 29
+index = 3
 command = "SELECT_*_FROM_TACIOT_WHERE_TYPE='555555'"
 enc, _ = encrypt(id.encode(), ck)
 enc_text = convert_bytes_to_text(enc)
@@ -66,11 +66,15 @@ try:
     if(response.status != 200):
         print("Error ", response.status, ": ", response.reason)
     else:
-        header_received = response.getheader('return')
-        print(header_received)
-        bytes = convert_text_to_bytes(header_received.split('|')[3])
-        data,_ = decrypt(bytes, ck)
-        print(data.decode())
+
+        header_received = response.getheader('return_status')
+        if(header_received != 'ack'):
+            print(header_received)
+        else:
+            header_received = response.getheader('return_data')
+            bytes = convert_text_to_bytes(header_received.split('|')[3])
+            data,_ = decrypt(bytes, ck)
+            print(data.decode())
 except:
     print("Could not stabilish/mantain connection")
 

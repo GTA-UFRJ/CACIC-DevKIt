@@ -6,7 +6,6 @@ from scacic_macros import *
 import pandas as pd
 from scacic_errors import Server_error
 from scacic_utils import *
-from scacic_db_secure_interface import *
 
 def do_nothing(time, id, received_payload, ck):
     return received_payload, Server_error.OK

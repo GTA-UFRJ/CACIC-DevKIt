@@ -19,20 +19,22 @@ def create_db():
         TIME        CHAR(20)            NOT NULL,
         TYPE        CHAR(6)             NOT NULL,
         PK          CHAR(8)             NOT NULL,
+        FW          CHAR(6)             NOT NULL,
+        VN          CHAR(6)             NOT NULL,
         SIZE        INT                 NOT NULL,
         ENCRYPTED   TEXT                NOT NULL
         );
         """)
     connection.close()
 
-def db_publish(time, pk, type, result):
+def db_publish(time, pk, type, fw, vn, result):
     id = get_random_id()
     enc_text = convert_bytes_to_text(result)
     #enc_text = "a5-23-12-f1-ab-"
 
     command = f"""
-    INSERT INTO TACIOT (ID, TIME, TYPE, PK, SIZE, ENCRYPTED)
-    VALUES ({id},'{time}','{type}','{pk}',{len(result)},'{enc_text}')
+    INSERT INTO TACIOT (ID, TIME, TYPE, PK, FW, VN, SIZE, ENCRYPTED)
+    VALUES ({id},'{time}','{type}','{pk}','{fw}','{vn}',{len(result)},'{enc_text}')
     """
 
     error = Server_error.OK
@@ -57,7 +59,7 @@ def correct_command(command):
         return command.replace("_", " "), Server_error.OK
 
 def convert_data_tuple_in_dict(tuple):
-    return {"time":tuple[1],"type":tuple[2],"pk":tuple[3],"size":tuple[4],"encrypted":convert_text_to_bytes(tuple[5])}
+    return {"time":tuple[1],"type":tuple[2],"pk":tuple[3],"fw":tuple[4],"vn":tuple[5],"size":tuple[6],"encrypted":convert_text_to_bytes(tuple[7])}
 
 def db_query(command, index):
     data_list, error = db_multi_query(command)
@@ -95,7 +97,7 @@ def db_multi_query(command):
 # Test code
 if __name__ == "__main__":
     #create_db()
-    db_publish('horario', '72d41281', 123456, "a5-23-12-f1-ab-")
+    db_publish('horario', '72d41281', 123456, 654321, 789101, "a5-23-12-f1-ab-")
     data, error = db_query('select * from taciot where type=123456',0)
     #data, error = db_multi_query('select * from taciot where type=123456')
     if(error == Server_error.OK):

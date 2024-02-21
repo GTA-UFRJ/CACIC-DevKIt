@@ -8,3 +8,6 @@ SERVER_PORT = 8080
 SEALS_PATH = './core/server/resources'
 DATABASE_PATH = './use_case/database/taciot.db'
 DATASETS_ROOT = './use_case/database/'
+
+IV_SIZE = 12
+MAC_SIZE = 16

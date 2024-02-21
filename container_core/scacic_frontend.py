@@ -16,19 +16,22 @@ class Request_handler(BaseHTTPRequestHandler):
         self.send_response(200)
         if(pub_or_query.error == Server_error.OK):
             pub_or_query.error = -1
-        self.send_header('return', str(pub_or_query.error))
+        self.send_header('return_status', str(pub_or_query.error))
+        self.send_header('return_data', None)
         self.end_headers() 
 
     def successfull_publication_response(self):
         print_if_debug("Published with success")
         self.send_response(200)
-        self.send_header('return', 'ack')
+        self.send_header('return_status', 'ack')
+        self.send_header('return_data', None)
         self.end_headers() 
 
     def successfull_query_response(self, query):
         print_if_debug("Queried with success")
         self.send_response(200)
-        self.send_header('return', query.respone)
+        self.send_header('return_status', 'ack')
+        self.send_header('return_data', query.respone)
         self.end_headers() 
 
     def publish(self):

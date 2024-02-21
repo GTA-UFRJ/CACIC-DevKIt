@@ -19,14 +19,13 @@ class Publication:
             self.enc_bytes = convert_text_to_bytes(self.enc_text)
             self.set_task()
     
-    # TODO: mudar formato da mensagem aqui
     def parse_fields(self, message):
         fields_list = message.split('/')[3].split('|')
-        if(len(fields_list) != 10):
+        if(len(fields_list) != 14):
             self.error = Server_error.print_error(Server_error.INVALID_ENCRYPTED_FIELD_ERROR)
             raise
-        self.time, self.id, self.type, self.enc_size, self.enc_text = [fields_list[index] for index in range(len(fields_list)) if index % 2 != 0]
-        print_if_debug("Parsed fields: ", self.time, self.id, self.type, self.enc_size, self.enc_text, sep=' ')
+        self.time, self.id, self.type, self.fw, self.vn, self.enc_size, self.enc_text = [fields_list[index] for index in range(len(fields_list)) if index % 2 != 0]
+        print_if_debug("Parsed fields: ", self.time, self.id, self.type, self.fw, self.vn, self.enc_size, self.enc_text, sep=' ')
 
     def set_task(self):  
         server_functions = get_server_functions()
@@ -39,8 +38,7 @@ class Publication:
     def succeeded(self):
         return (self.error == Server_error.OK)
 
-    # TODO: mudar formato aqui também
-    # time|...|pk|...|type|...|payload|...|permission1|...|permission2|...
+    # time|...|pk|...|type|...|fw|...|vn|...|payload|...|permission1|...|permission2|...
     def parse_fields_decrypted(self, decrypted):
         decrypted_fields, self.error = parse_fields_decrypted(decrypted)
         if(self.error != Server_error.OK):
@@ -58,16 +56,15 @@ class Publication:
             return None, error_code
         self.encrypted_result, self.error = encrypt(plain_result.encode(), ca)
 
-    # TODO: mudar formato aqui também
     def build_result(self):
         prefix_list = ['permissions{}'.format(i) for i in range(len(self.permissions_list))]
         permissions_str = '|'.join([elem for pair in zip(prefix_list, self.permissions_list) for elem in pair])
-        plain_result = "time|{}|pk|{}|type|{}|payload|{}|{}".format(self.time, self.id, self.type, self.result_payload, permissions_str)
+        plain_result = "time|{}|pk|{}|type|{}|fw|{}|vn|{}|payload|{}|{}".format(self.time, self.id, self.type, self.fw, self.vn, self.result_payload, permissions_str)
         print_if_debug("Generated plain result payload: ", plain_result)
         self.encrypt_result(plain_result)
 
     def publish_result(self):
-        self.error = db_publish(self.time, self.id, self.type, self.encrypted_result)
+        self.error = db_publish(self.time, self.id, self.type, self.fw, self.vn, self.encrypted_result)
 
     def execute_task(self):
         self.result_payload, self.error = self.task_function(self.time, self.id, self.received_payload, self.ck)

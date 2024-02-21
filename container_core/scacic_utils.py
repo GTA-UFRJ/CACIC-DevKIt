@@ -36,12 +36,12 @@ def get_random_id():
     return ''.join(random.choices(digits, k=8))
 
 def get_random_nonce():
-    return secrets.token_bytes(12)
+    return secrets.token_bytes(IV_SIZE)
 
 def separare_fields_encrypted(encrypted_data):
-    if(len(encrypted_data) <= 16+12):
+    if(len(encrypted_data) <= MAC_SIZE+IV_SIZE):
         return None, None, None, Server_error.print_error(Server_error.INVALID_ENCRYPTED_FIELD_ERROR)
-    mac, iv, data = encrypted_data[:16], encrypted_data[16:16+12], encrypted_data[16+12:]
+    mac, iv, data = encrypted_data[:MAC_SIZE], encrypted_data[MAC_SIZE:MAC_SIZE+IV_SIZE], encrypted_data[MAC_SIZE+IV_SIZE:]
     return mac, iv, data, Server_error.OK
 
 def build_fields_encrypted(mac, data, nonce):
@@ -74,16 +74,16 @@ def decrypt(encrypted_data, key):
 
     return plaintext, Server_error.OK
 
-# time|...|pk|...|type|...|payload|...|permission1|...|permission2|...
+# time|...|pk|...|type|...|fw|...|vn|...|payload|...|permission1|...|permission2|...
 # TODO: fw_id=...&pk=...&vn=...&payload=...&permissions={}
 def parse_fields_decrypted(decrypted):
     fields_list = decrypted.split('|')
     if(len(fields_list) < 10):
         return None, Server_error.print_error(Server_error.EMPTY_PERMISSIONS_ERROR)
 
-    time, id, type, payload  = [fields_list[index] for index in range(1,8,2)]
-    permissions_list = [fields_list[index] for index in range(9,len(fields_list)) if index % 2 != 0]
-    return {'time':time,'id':id,'type':type,'payload':payload,'perms_list':permissions_list}, Server_error.OK
+    time, id, type, fw, vn, payload  = [fields_list[index] for index in range(1,12,2)]
+    permissions_list = [fields_list[index] for index in range(13,len(fields_list)) if index % 2 != 0]
+    return {'time':time,'id':id,'type':type,'fw':fw,'vn':vn,'payload':payload,'perms_list':permissions_list}, Server_error.OK
 
 def authenticate_client(received_id, decrypted_id):
     return received_id == decrypted_id   
