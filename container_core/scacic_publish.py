@@ -56,6 +56,11 @@ class Publication:
             return None, error_code
         self.encrypted_result, self.error = encrypt(plain_result.encode(), ca)
 
+
+        
+        decrypted, self.error = decrypt(self.encrypted_result, ca)
+        print(decrypted.decode())
+
     def build_result(self):
         prefix_list = ['permissions{}'.format(i) for i in range(len(self.permissions_list))]
         permissions_str = '|'.join([elem for pair in zip(prefix_list, self.permissions_list) for elem in pair])

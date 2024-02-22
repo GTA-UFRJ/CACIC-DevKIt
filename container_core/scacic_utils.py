@@ -3,6 +3,8 @@
 # Descripton: auxiliary functions for encryption, etc
 
 from Crypto.Cipher import AES
+from Crypto.Hash import SHA256
+from Crypto.Util import Counter
 from scacic_errors import Server_error
 import random
 #from scacic_databse_calls import *
@@ -50,13 +52,28 @@ def build_fields_encrypted(mac, data, nonce):
 # TODO: mudar para AES-CTR
 def encrypt(input, key):
     try:    
-        encobj = AES.new(key, AES.MODE_GCM, nonce=get_random_nonce())
-        ciphertext, auth_tag = encobj.encrypt_and_digest(input)
+        nonce = get_random_nonce()
+        counter = Counter.new(128, initial_value=int(nonce.hex(),16))
+        encobj = AES.new(key, AES.MODE_CTR, counter=counter)
+        ciphertext = b''
+        for i in range(0,len(input),32):
+            block = input[i:i+32]
+            ciphertext += encobj.encrypt(block)
+        hash_object = SHA256.new(data=input)
+        hash_object.update(nonce)
+        hash_object.update(key)
+        auth_tag = hash_object.digest()
     except Exception as e:
         print("Encryption error: ", e)
         return None, Server_error.print_error(Server_error.DATA_ENCRYPTION_ERROR)
 
-    result_bytes = build_fields_encrypted(auth_tag, ciphertext, encobj.nonce)
+    result_bytes = build_fields_encrypted(auth_tag, ciphertext, nonce)
+    
+    #print(convert_bytes_to_text(input))
+    #print(convert_bytes_to_text(nonce))
+    #print(convert_bytes_to_text(ciphertext))
+    #print(convert_bytes_to_text(auth_tag))
+    #print(convert_bytes_to_text(result_bytes))
 
     return result_bytes, Server_error.OK
 
@@ -66,12 +83,29 @@ def decrypt(encrypted_data, key):
         return None, error_code
         
     try:
-        encobj = AES.new(key, AES.MODE_GCM, nonce)
-        plaintext = encobj.decrypt_and_verify(ciphertext, auth_tag)
+        counter = Counter.new(128, initial_value=int(nonce.hex(),16))
+        encobj = AES.new(key, AES.MODE_CTR, counter=counter)
+        plaintext = b''
+        for i in range(0,len(ciphertext),32):
+            block = ciphertext[i:i+32]
+            plaintext += encobj.decrypt(block)
+        hash_object = SHA256.new(data=plaintext)
+        hash_object.update(nonce)
+        hash_object.update(key)
+        retrieved_mac_tag = hash_object.digest()
     except Exception as e:
         print("Decryption error: ", e)
         return None, Server_error.print_error(Server_error.MESSAGE_DECRYPTION_ERROR)
+    
+    #print(convert_bytes_to_text(plaintext))
+    #print(convert_bytes_to_text(nonce))
+    #print(convert_bytes_to_text(ciphertext))
+    #print(convert_bytes_to_text(retrieved_mac_tag))
+    #print(convert_bytes_to_text(encrypted_data))
 
+    if(retrieved_mac_tag != auth_tag):
+        return None, Server_error.print_error(Server_error.MESSAGE_DECRYPTION_ERROR)
+    
     return plaintext, Server_error.OK
 
 # time|...|pk|...|type|...|fw|...|vn|...|payload|...|permission1|...|permission2|...

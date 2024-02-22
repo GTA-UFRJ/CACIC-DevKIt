@@ -13,7 +13,7 @@ f = open('./core/server/resources/storage_key_container','rb')
 ca = f.read()
 f.close()
 
-id = 'dea73a76'
+id = 'de40c547'
 f = open('./core/server/resources/'+id+'_container','rb')
 enc_ck = f.read()
 ck, _ = decrypt(enc_ck, ca)
@@ -49,7 +49,7 @@ if(key == 'q' or key == "Q"):
 # QUERY
 
 # pk|72d41281|index|000000|size|23|command|SELECT_*_FROM_TACIOT_WHERE_TYPE='555555'|encrypted|
-index = 3
+index = 0
 command = "SELECT_*_FROM_TACIOT_WHERE_TYPE='555555'"
 enc, _ = encrypt(id.encode(), ck)
 enc_text = convert_bytes_to_text(enc)

@@ -96,11 +96,11 @@ def db_multi_query(command):
 
 # Test code
 if __name__ == "__main__":
-    #create_db()
-    db_publish('horario', '72d41281', 123456, 654321, 789101, "a5-23-12-f1-ab-")
-    data, error = db_query('select * from taciot where type=123456',0)
+    create_db()
+    #db_publish('horario', '72d41281', 123456, 654321, 789101, "a5-23-12-f1-ab-")
+    #data, error = db_query('select * from taciot where type=123456',0)
     #data, error = db_multi_query('select * from taciot where type=123456')
-    if(error == Server_error.OK):
-        print(data)
-    else:
-        Server_error.print_error(error)
+    #if(error == Server_error.OK):
+    #    print(data)
+    #else:
+    #    Server_error.print_error(error)
