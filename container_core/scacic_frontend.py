@@ -3,6 +3,7 @@
 # Descripton: receive HTTP message
 #!/usr/bin/env python
 
+''''''
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from scacic_publish import Publication
 from scacic_query import Query
@@ -72,4 +73,5 @@ def main():
     server_handler.serve_forever()
 
 if __name__ == '__main__':
+    print("hello from gramine", flush=True)
     main()

@@ -24,7 +24,7 @@ def print_if_debug(*args, sep=''):
         result = ""
         for arg in args:
             result = result + str(arg) + sep
-        print(result)
+        print(result, flush=True)
 
 def convert_text_to_bytes(text):
     return bytes.fromhex(text.replace('-',''))

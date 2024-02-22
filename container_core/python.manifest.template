@@ -1,3 +1,5 @@
+# make clean ; make SGX=1 ; gramine-sgx python scacic_frontend.py
+
 loader.entrypoint = "file:{{ gramine.libos }}"
 libos.entrypoint = "{{ entrypoint }}"
 
@@ -14,20 +16,23 @@ loader.insecure__use_host_env = true
 
 loader.pal_internal_mem_size = "128M"
 
-#
-# SEALS_PATH = './core/server/resources'
-# DATABASE_PATH = './use_case/database/taciot.db'
-# DATASETS_ROOT = './use_case/database/'
-#
+# SEALS_PATH = '/resources'
+# DATABASE_PATH = '/database/taciot.db'
 
 fs.mounts = [
   { uri = "file:{{ gramine.runtimedir() }}", path = "/lib" },
   { uri = "file:{{ arch_libdir }}", path = "{{ arch_libdir }}" },
   { uri = "file:/usr", path = "/usr" },
   { uri = "file:/etc", path = "/etc" },
-  { uri = "file:{{ database_path }}", path = "./use_case/database/taciot.db" },
-  { uri = "file:{{ database_path }}", path = "./core/server/resources" },
-  { type = "tmpfs", path = "/tmp" }
+  { uri = "file:{{ database_path }}", path = "/database" },
+  { uri = "file:{{ seals_path }}", path = "/resources" },
+  { type = "tmpfs", path = "/tmp" },
+
+  {% for path in python.get_sys_path(entrypoint) %}
+  { path = "{{ path }}", uri = "file:{{ path }}" },
+  {% endfor %}
+
+  #{ type = "encrypted", uri = "file:{{ seals_path }}/storage_key_container", path = "/resources/storage_key_container", key_name="_sgx_mrenclave"}
 ]
 
 sgx.enclave_size = "4G"
@@ -44,9 +49,28 @@ sgx.trusted_files = [
   "file:{{ python.stdlib }}/",
   "file:{{ python.distlib }}/",
   "file:{{ python.get_path('stdlib', vars={'installed_base': '/usr/local'}) }}/",
+  "file:/etc/mime.types",
 
   "file:{{ script_path }}",
 
-  "file:{{ database_path }}",
-  "file:{{ database_path }}saved_model",
+  {% for path in python.get_sys_path(entrypoint) %}
+  "file:{{ path }}{{ '/' if path.is_dir() else '' }}",
+  {% endfor %}
+
+  "file:{{seals_path}}/storage_key_container",
+  "file:scacic_databse_calls.py",
+  "file:scacic_disk_manager.py",
+  "file:scacic_errors.py",
+  "file:scacic_frontend.py",
+  "file:scacic_macros.py",
+  "file:scacic_publish.py",
+  "file:scacic_query.py",
+  "file:scacic_tasks_calls.py",
+  "file:scacic_utils.py"
+]
+
+
+sgx.allowed_files = [
+  "file:{{database_path}}/taciot.db",
+  "file:{{ seals_path }}"
 ]

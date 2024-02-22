@@ -3,7 +3,6 @@
 # Descripton: function called by publciation code. Programmed by DevKit user
 
 from scacic_macros import * 
-import pandas as pd
 from scacic_errors import Server_error
 from scacic_utils import *
 
