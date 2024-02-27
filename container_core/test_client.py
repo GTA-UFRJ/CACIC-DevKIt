@@ -20,6 +20,8 @@ ck, _ = decrypt(enc_ck, ca)
 print("ID: ", id)
 print("CK: ", convert_bytes_to_text(ck))
 
+# PUBLISH WITH GET
+
 payload = "time|10h30m47s|pk|72d41281|type|123456|fw|654321|vn|789101|payload|250|permission1|" + id
 
 enc, _ = encrypt(payload.encode(), ck)
@@ -28,10 +30,10 @@ enc_text = convert_bytes_to_text(enc)
 request = 'time|' + time + '|pk|' + id + '|type|555555|fw|654321|vn|789101|size|' + str(len(enc_text)) + '|encrypted|' + enc_text
 print(request)
 
-complete_request = '/publish/size=' + str(len(request)) + '/' + request
+publish_complete_request = '/publish/size=' + str(len(request)) + '/' + request
 
 try:
-    connection.request('GET', complete_request)
+    connection.request('GET', publish_complete_request)
     response = connection.getresponse()
 
     if(response.status != 200):
@@ -42,6 +44,7 @@ try:
 except:
     print("Could not stabilish/mantain connection")
 
+key = ''
 key = input("Type any key to test query. Type 'q' to exit.")
 if(key == 'q' or key == "Q"):
     exit(0)
@@ -75,6 +78,26 @@ try:
             bytes = convert_text_to_bytes(header_received.split('|')[3])
             data,_ = decrypt(bytes, ck)
             print(data.decode())
+except:
+    print("Could not stabilish/mantain connection")
+
+
+key = ''
+key = input("Type any key to test publish with POST. Type 'q' to exit.")
+if(key == 'q' or key == "Q"):
+    exit(0)
+
+# PUBLISH WITH POST
+
+try:
+    connection.request('POST', '/publish', publish_complete_request)
+    response = connection.getresponse()
+
+    if(response.status != 200):
+        print("Error ", response.status, ": ", response.reason)
+    else:
+        header_received = response.getheader('return_status')
+        print(header_received)
 except:
     print("Could not stabilish/mantain connection")
 

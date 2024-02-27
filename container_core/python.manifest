@@ -1,0 +1,109 @@
+[loader]
+entrypoint = "file:/usr/local/lib/x86_64-linux-gnu/gramine/libsysdb.so"
+log_level = "debug"
+insecure__use_cmdline_argv = true
+insecure__use_host_env = true
+pal_internal_mem_size = "128M"
+
+[loader.env]
+LD_LIBRARY_PATH = "/lib:/usr/lib:/lib/x86_64-linux-gnu:/usr//lib/x86_64-linux-gnu"
+OMP_NUM_THREADS = "8"
+
+[libos]
+entrypoint = "/usr/bin/python3.8"
+
+[[fs.mounts]]
+uri = "file:/usr/local/lib/x86_64-linux-gnu/gramine/runtime/glibc"
+path = "/lib"
+
+[[fs.mounts]]
+uri = "file:/lib/x86_64-linux-gnu"
+path = "/lib/x86_64-linux-gnu"
+
+[[fs.mounts]]
+uri = "file:/usr"
+path = "/usr"
+
+[[fs.mounts]]
+uri = "file:/etc"
+path = "/etc"
+
+[[fs.mounts]]
+uri = "file:/home/guiaraujo/CACIC-DevKIt/use_case/database"
+path = "/database"
+
+[[fs.mounts]]
+uri = "file:/home/guiaraujo/CACIC-DevKIt/core/server/resources"
+path = "/resources"
+
+[[fs.mounts]]
+type = "tmpfs"
+path = "/tmp"
+
+[[fs.mounts]]
+path = "/usr/lib/python3.8"
+uri = "file:/usr/lib/python3.8"
+
+[[fs.mounts]]
+path = "/usr/lib/python3.8/lib-dynload"
+uri = "file:/usr/lib/python3.8/lib-dynload"
+
+[[fs.mounts]]
+path = "/home/guiaraujo/.local/lib/python3.8/site-packages"
+uri = "file:/home/guiaraujo/.local/lib/python3.8/site-packages"
+
+[[fs.mounts]]
+path = "/usr/local/lib/python3.8/dist-packages"
+uri = "file:/usr/local/lib/python3.8/dist-packages"
+
+[[fs.mounts]]
+path = "/usr/lib/python3/dist-packages"
+uri = "file:/usr/lib/python3/dist-packages"
+
+[sgx]
+enclave_size = "4G"
+max_threads = 32
+edmm_enable = false
+nonpie_binary = true
+trusted_files = [
+    { uri = "file:/usr/local/lib/x86_64-linux-gnu/gramine/libsysdb.so" },
+    { uri = "file:/usr/bin/python3.8" },
+    { uri = "file:/usr/local/lib/x86_64-linux-gnu/gramine/runtime/glibc/" },
+    { uri = "file:/lib/x86_64-linux-gnu/" },
+    { uri = "file:/usr//lib/x86_64-linux-gnu/" },
+    { uri = "file:/usr/lib/python3.8/" },
+    { uri = "file:/usr/lib/python3/dist-packages/" },
+    { uri = "file:/usr/local/lib/python3.8/" },
+    { uri = "file:/etc/mime.types" },
+    { uri = "file:/home/guiaraujo/CACIC-DevKIt/container_core/scacic_frontend.py" },
+    { uri = "file:/usr/lib/python3.8/" },
+    { uri = "file:/usr/lib/python3.8/lib-dynload/" },
+    { uri = "file:/home/guiaraujo/.local/lib/python3.8/site-packages/" },
+    { uri = "file:/usr/local/lib/python3.8/dist-packages/" },
+    { uri = "file:/usr/lib/python3/dist-packages/" },
+    { uri = "file:/home/guiaraujo/CACIC-DevKIt/core/server/resources/storage_key_container" },
+    { uri = "file:scacic_databse_calls.py" },
+    { uri = "file:scacic_disk_manager.py" },
+    { uri = "file:scacic_errors.py" },
+    { uri = "file:scacic_frontend.py" },
+    { uri = "file:scacic_macros.py" },
+    { uri = "file:scacic_publish.py" },
+    { uri = "file:scacic_query.py" },
+    { uri = "file:scacic_tasks_calls.py" },
+    { uri = "file:scacic_utils.py" },
+]
+allowed_files = [
+    "file:/home/guiaraujo/CACIC-DevKIt/use_case/database/taciot.db",
+    "file:/home/guiaraujo/CACIC-DevKIt/core/server/resources",
+]
+isvprodid = 0
+isvsvn = 0
+remote_attestation = "none"
+debug = false
+require_avx = false
+require_avx512 = false
+require_mpx = false
+require_pkru = false
+require_amx = false
+require_exinfo = false
+enable_stats = false

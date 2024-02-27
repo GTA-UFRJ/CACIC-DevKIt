@@ -37,7 +37,7 @@ class Request_handler(BaseHTTPRequestHandler):
 
     def publish(self):
         try:
-            publication = Publication(self.path)
+            publication = Publication(self.data_for_publish)
             publication.publication_request_exec()
             publication.publish_result()
             self.successfull_publication_response()
@@ -55,16 +55,34 @@ class Request_handler(BaseHTTPRequestHandler):
             self.error_response(query)
 
     def do_GET(self):
-        print_if_debug("Server received ", self.path)
+        print_if_debug("Server received GET ", self.path)
 
         msg_type = self.path.split('/')[1]
 
         if(msg_type == "publish"):
+            self.data_for_publish = self.path
             self.publish()
         elif(msg_type == "query"):
             self.query()
         else:
-            print_if_debug("Unknown message type")
+            print_if_debug("Unknown GET message type")
+
+    def get_post_body(self):
+        content_length = int(self.headers['Content-Length'])
+        post_data_bytes = self.rfile.read(content_length)
+        return post_data_bytes.decode("utf-8")
+    
+    def do_POST(self):
+        print_if_debug("Server received POST ", self.path)
+
+        msg_type = self.path.split('/')[1]
+
+        if(msg_type == "publish"):
+            self.data_for_publish = self.get_post_body()
+            self.publish()
+        else:
+            print_if_debug("Unknown POST message type")
+
 
 def main():
     print('SCACIC server is starting on IP ', SERVER_IP, ' and port ', SERVER_PORT)
