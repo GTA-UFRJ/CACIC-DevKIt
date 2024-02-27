@@ -5,6 +5,11 @@
 
 ''''''
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
+import threading
+import socket
+
+
 from scacic_publish import Publication
 from scacic_query import Query
 from scacic_macros import SERVER_IP, SERVER_PORT
@@ -83,12 +88,18 @@ class Request_handler(BaseHTTPRequestHandler):
         else:
             print_if_debug("Unknown POST message type")
 
+class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
+    """Handle requests in a separate thread."""
+    pass
+
 
 def main():
     print('SCACIC server is starting on IP ', SERVER_IP, ' and port ', SERVER_PORT)
     server_address = (SERVER_IP, SERVER_PORT)
-    server_handler = HTTPServer(server_address, Request_handler)
+    #server_handler = HTTPServer(server_address, Request_handler)
+    server_handler = ThreadingSimpleServer(server_address, Request_handler)
     server_handler.serve_forever()
+
 
 if __name__ == '__main__':
     print("hello from gramine", flush=True)
