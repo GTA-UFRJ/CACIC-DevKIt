@@ -66,7 +66,8 @@ class Query:
         return self.id in self.retrieved_data['permissions_list']
     
     def make_response(self, encrypted):
-        return "size|0x" + format(getsizeof(encrypted), '02x') + '|encrypted|' + convert_bytes_to_text(encrypted)
+        enc_text = convert_bytes_to_text(encrypted)
+        return "size|0x" + format(int(len(enc_text)/3), '02x') + '|encrypted|' + enc_text
 
     def query_request_exec(self):
 

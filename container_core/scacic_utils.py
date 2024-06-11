@@ -61,7 +61,7 @@ def encrypt(input, key):
             ciphertext += encobj.encrypt(block)
         hash_object = SHA256.new(data=input)
         hash_object.update(nonce)
-        hash_object.update(key)
+        #hash_object.update(key)
         auth_tag = hash_object.digest()
     except Exception as e:
         print("Encryption error: ", e)
@@ -91,7 +91,7 @@ def decrypt(encrypted_data, key):
             plaintext += encobj.decrypt(block)
         hash_object = SHA256.new(data=plaintext)
         hash_object.update(nonce)
-        hash_object.update(key)
+        #hash_object.update(key)
         retrieved_mac_tag = hash_object.digest()
     except Exception as e:
         print("Decryption error: ", e)

@@ -59,7 +59,11 @@ class Request_handler(BaseHTTPRequestHandler):
         except Exception:
             self.error_response(query)
 
+    def fix_path(self):
+        self.path = self.path.replace('%27', "'")
+
     def do_GET(self):
+        self.fix_path()
         print_if_debug("Server received GET ", self.path)
 
         msg_type = self.path.split('/')[1]

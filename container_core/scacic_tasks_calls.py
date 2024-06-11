@@ -11,4 +11,5 @@ def do_nothing(time, id, received_payload, ck):
 
 def get_server_functions():
     return {
+        '123456' : do_nothing,
         '555555' : do_nothing}

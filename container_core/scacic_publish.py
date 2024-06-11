@@ -46,9 +46,9 @@ class Publication:
         self.received_payload, self.permissions_list = decrypted_fields['payload'], decrypted_fields['perms_list']
 
         if(authenticate_client(self.id, decrypted_fields['id'])):
-            self.error = Server_error.print_error(Server_error.AUTHENTICATION_ERROR)
-        else:
             print_if_debug("Client ", self.id, " authenticated!")
+        else:
+            self.error = Server_error.print_error(Server_error.AUTHENTICATION_ERROR)
         
     def encrypt_result(self, plain_result):
         ca, error_code = get_ca_key()
@@ -56,8 +56,6 @@ class Publication:
             return None, error_code
         self.encrypted_result, self.error = encrypt(plain_result.encode(), ca)
 
-
-        
         decrypted, self.error = decrypt(self.encrypted_result, ca)
         print(decrypted.decode())
 

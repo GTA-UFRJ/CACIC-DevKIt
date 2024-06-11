@@ -15,13 +15,15 @@ f.write(ca)
 f.close()
 print("Written in created file: ", ca_path, end='\n\n')
 
-id = secrets.token_hex(4)
+#id = secrets.token_hex(4)
+id = "72d41281" 
 print("ID: ", id)
 client_file_path = './core/server/resources/'+id+"_container"
 f = open(client_file_path, 'wb')
 print("Created file: ", client_file_path, end='\n\n')
 
-ck = secrets.token_bytes(16)
+#ck = secrets.token_bytes(16)
+ck = b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 print("CK: ", convert_bytes_to_text(ck))
 
 enc_ck, error = encrypt(ck,ca)
